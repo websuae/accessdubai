@@ -26,6 +26,7 @@ class Webservice {
 
   Future<T> loadPost<T>(Resource<T> resource, Map body) async {
     final response = await http.post(Uri.parse(resource.url), body: body);
+    // final response = await http.http.MultipartRequest("POST", postUri);
     print("response........................." + response.toString());
     print("response........................." + response.statusCode.toString());
 

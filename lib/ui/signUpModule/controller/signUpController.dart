@@ -2,7 +2,9 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:visa_app/constants/constants.dart';
+import 'package:visa_app/constants/sharePrefConstants.dart';
 import 'package:visa_app/service/ApiEndPoint.dart';
 import 'package:visa_app/ui/HomeModule/view/homeScreen.dart';
 import 'package:visa_app/ui/signUpModule/model/SignUpResponseModel.dart';
@@ -42,6 +44,7 @@ class SignUpController extends GetxController {
 
   // button check variable
   var isValidValidation = false.obs;
+  var countryCode="+91";
 
   checkName(String name) {
     if (name == "") {
@@ -70,9 +73,6 @@ class SignUpController extends GetxController {
     if (password == "") {
       passError.value = true;
       passwordValidationMessage.value = "Please enter Password";
-    } else if (!validatePassword(password)) {
-      passError.value = true;
-      passwordValidationMessage.value = "Please enter valid password";
     } else {
       passError.value = false;
     }
@@ -118,20 +118,22 @@ class SignUpController extends GetxController {
     map["uname"] = nameController.text;
     map["uemail"] = emailController.text;
     map["upass"] = passwordController.text;
-    map["umobile"] = mobileController.text;
+    map["umobile"] = countryCode+" "+mobileController.text;
     map["unationality"] = countryDropDownName.value;
 
     Webservice().loadPost(getSignUp, map).then(
           (model) => {
             print("name is::" + model.message.toString()),
             if (model.status == "true") {
+
+              addBoolToSF(true,model),
               Get.offAll(HomePage())
-    // Navigator.pushReplacement(
-              //   context,
-              //   MaterialPageRoute(
-              //       builder: (context) => HomePage()),
-              // )
-            } else {}
+
+            } else {
+              addBoolToSF(false,model),
+
+            }
+
           },
         );
   }
@@ -161,8 +163,16 @@ class SignUpController extends GetxController {
             Get.snackbar("dfasdf", message);
             return signUpResponceModelFromJson(response.body);
           }
-          return result;
         });
   }
-
+  addBoolToSF(bool value,SignUpResponceModel model) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    prefs.setBool(isLogin, value);
+    if(value){
+      prefs.setString(userName, nameController.text.toString());
+      prefs.setString(userEmail, model.registrationEmail.toString());
+      prefs.setString(userId, model.registrationId.toString());
+      print("name of user"+prefs.getString(userName).toString());
+    }
+  }
 }

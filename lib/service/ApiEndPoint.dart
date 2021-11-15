@@ -5,4 +5,10 @@ class ApiEndpoint {
   static String login = baseUrl + "/Users/login";
   static String signUp = baseUrl + "/Users/register";
   static String forgotPassword = baseUrl + "/Users/forgetpassword";
+  static String visaType = baseUrl + "/Users/get_visatype";
+  static String countryList = baseUrl + "/Users/get_countries_api";
+  static String selectVisatype = baseUrl + "/Users/get_countries_price";
+  static String applyForVisa = baseUrl + "/Users/applyForVisa";
+  static String tracking = baseUrl + "/Users/checkApplicationStatus";
+  static String faq = baseUrl + "/Users/faq";
 }

@@ -2,7 +2,10 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:get_storage/get_storage.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:visa_app/constants/constants.dart';
+import 'package:visa_app/constants/sharePrefConstants.dart';
 import 'package:visa_app/service/ApiEndPoint.dart';
 import 'package:visa_app/ui/HomeModule/view/homeScreen.dart';
 import 'package:visa_app/ui/signInModule/model/LoginResponceModel.dart';
@@ -23,6 +26,7 @@ class SignInController extends GetxController {
 
   // button check variable
   var isValidValidation = false.obs;
+  final storage = GetStorage();
 
   checkEmail(String email) {
     if (email == "") {
@@ -42,10 +46,6 @@ class SignInController extends GetxController {
       passError.value = true;
       passwordValidationMessage.value = "Please enter Password";
     }
-    // else if (!validatePassword(password)) {
-    //   passError.value = true;
-    //   passwordValidationMessage.value = "Please enter valid password";
-    // }
     else {
       passError.value = false;
     }
@@ -70,8 +70,14 @@ class SignInController extends GetxController {
           (model) => {
             print("name is::" + model.userName.toString()),
             if (model.status == "true") {
+
+              addBoolToSF(true,model),
+
               Get.offAll(HomePage())
-            } else {}
+            } else {
+             addBoolToSF(false,model),
+
+            }
             // {storage.write(isLogin, false)}
           },
         );
@@ -93,14 +99,25 @@ class SignInController extends GetxController {
           String success = result["status"];
           if (success == "true") {
             loader.value=false;
+
             return loginResponceModelFromJson(response.body);
           } else {
             loader.value=false;
             String message = result["message"];
-            Get.snackbar("dfasdf", message);
+            Get.snackbar("ooopsss", message);
             return loginResponceModelFromJson(response.body);
           }
-          return result;
         });
+  }
+
+  addBoolToSF(bool value,LoginResponceModel model) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    prefs.setBool(isLogin, value);
+    if(value){
+      prefs.setString(userName, model.userName.toString());
+      prefs.setString(userEmail, model.userEmail.toString());
+      prefs.setString(userId, model.userId.toString());
+      print("name of user"+prefs.getString(userName).toString());
+    }
   }
 }

@@ -5,6 +5,7 @@ import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:page_transition/page_transition.dart';
 import 'package:visa_app/constants/appImages.dart';
+import 'package:visa_app/ui/HomeModule/view/homeScreen.dart';
 import 'package:visa_app/widget/customdrawer.dart';
 
 class CommonAppBar extends StatelessWidget implements PreferredSizeWidget {
@@ -20,6 +21,7 @@ class CommonAppBar extends StatelessWidget implements PreferredSizeWidget {
   final BuildContext? context;
   final GlobalKey<ScaffoldState>? scaffoldKey;
   final angle = 0.0;
+  var isFromBottom = false;
 
   CommonAppBar(
       {this.title,
@@ -32,7 +34,8 @@ class CommonAppBar extends StatelessWidget implements PreferredSizeWidget {
       this.action,
       this.scaffoldKey,
       this.textColor,
-      this.AppBarBackground});
+      this.AppBarBackground,
+      this.isFromBottom = false});
 
   @override
   Widget build(BuildContext context) {
@@ -49,15 +52,26 @@ class CommonAppBar extends StatelessWidget implements PreferredSizeWidget {
               onPressed: onPress != null
                   ? onPress
                   : () {
-                      Navigator.pop(context);
+                      print("isFromBottom:" + isFromBottom.toString());
+                      if (!isFromBottom) {
+                        Navigator.pop(context);
+                      } else {
+                        Navigator.pushReplacement(
+                            context,
+                            MaterialPageRoute(
+                                builder: (BuildContext context) => HomePage()));
+                      }
+                      // Navigator.pop(context);
                     })
           : Transform.rotate(
               angle: angle,
               child: PlatformIconButton(
                 icon: Padding(
-                  padding: EdgeInsets.only(left: 10.h),
+                  padding: EdgeInsets.only(left: 5.h),
                   child: Image.asset(
                     drawerImage,
+                    height: 50.h,
+                    width: 50.h,
                   ),
                 ),
                 onPressed: () {

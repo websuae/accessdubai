@@ -1,4 +1,5 @@
 import 'dart:convert';
+
 import 'package:country_code_picker/country_code_picker.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
@@ -32,9 +33,10 @@ class _SignUpState extends State<SignUp> {
   FocusNode mobileFocus = FocusNode();
   FocusNode nationalityFocus = FocusNode();
 
+
   List<dynamic> info = [];
 
-  List<String> countryList = <String>['+91', '+92', '+93', '+94', '+95', '+96'];
+
 
   @override
   void initState() {
@@ -99,11 +101,18 @@ class _SignUpState extends State<SignUp> {
           child: Image.asset(
             forgotImage,
             height: MediaQuery.of(context).size.height / 3.5,
+            width: MediaQuery.of(context).size.width,
             fit: BoxFit.fill,
           ),
         ),
         Padding(
-          padding: EdgeInsets.only(left: 20.w, top: 20.h),
+          padding: EdgeInsets.only(left: 10.w, top: 23.h),
+          child: InkWell(
+            onTap: () =>  Navigator.pop(context),
+              child: Icon(Icons.arrow_back_ios, color: colorWhite)),
+        ),
+        Padding(
+          padding: EdgeInsets.only(left: 40.w, top: 20.h),
           child: Align(
             alignment: Alignment.topLeft,
             child: Text(
@@ -146,10 +155,12 @@ class _SignUpState extends State<SignUp> {
                         controller.nameValidationMessage.value,
                         style: TextStyle(color: Colors.red),
                       )
-                    : Container()),
-                SizedBox(
-                  height: 10.h,
-                ),
+                    : Container(
+                  height: 10.h
+                )),
+                // SizedBox(
+                //   height: 10.h,
+                // ),
                 CommonSignUpTextField(
                   context: context,
                   hintText: emailHintText,
@@ -161,17 +172,17 @@ class _SignUpState extends State<SignUp> {
                   },
                   controller: controller.emailController,
                   textInputAction: TextInputAction.next,
-                  textInputType: TextInputType.name,
+                  textInputType: TextInputType.emailAddress,
                 ),
                 Obx(() => controller.emailError.value
                     ? Text(
                         controller.emailValidationMessage.value,
                         style: TextStyle(color: Colors.red),
                       )
-                    : Container()),
-                SizedBox(
-                  height: 10.h,
-                ),
+                    : Container( height: 10.h)),
+                // SizedBox(
+                //   height: 10.h,
+                // ),
                 CommonSignUpTextField(
                     context: context,
                     hintText: referralHintText,
@@ -180,20 +191,24 @@ class _SignUpState extends State<SignUp> {
                     textInputAction: TextInputAction.next,
                     textInputType: TextInputType.name),
                 SizedBox(
-                  height: 10.h,
+                  height: 15.h,
                 ),
                 Row(
                   children: [
                     Container(
-                      height: 38.h,
+                      height: 37.h,
                       decoration: BoxDecoration(
                           borderRadius: BorderRadius.circular(15),
                           color: Colors.grey.shade100,
                           border: Border.all(color: Colors.grey.shade300)),
                       child: CountryCodePicker(
-                        onChanged: print,
-                        initialSelection: 'IN',
-                        favorite: ['+91'],
+                        //onChanged: print,
+                        onChanged: (c) {
+                          controller.countryCode=c.dialCode.toString();
+                         print("c.code::"+c.dialCode.toString()) ;
+                        },
+                        initialSelection: '+971',
+                        favorite: ['+971'],
                         flagWidth: 20,
                         padding: EdgeInsets.zero,
                         showCountryOnly: false,
@@ -225,8 +240,8 @@ class _SignUpState extends State<SignUp> {
                         controller.mobileValidationMessage.value,
                         style: TextStyle(color: Colors.red),
                       )
-                    : Container()),
-                SizedBox(height: 10.h),
+                    : Container(height: 10.h)),
+                // SizedBox(height: 10.h),
                 CommonSignUpTextField(
                     context: context,
                     hintText: passwordHintText,
@@ -244,10 +259,10 @@ class _SignUpState extends State<SignUp> {
                         controller.passwordValidationMessage.value,
                         style: TextStyle(color: Colors.red),
                       )
-                    : Container()),
-                SizedBox(
-                  height: 10.h,
-                ),
+                    : Container(height: 10.h)),
+                // SizedBox(
+                //   height: 10.h,
+                // ),
                 FutureBuilder(
                     future: ReadJsonData(),
                     builder: (context, data) {
@@ -312,10 +327,10 @@ class _SignUpState extends State<SignUp> {
                         controller.nationValidationMessage.value,
                         style: TextStyle(color: Colors.red),
                       )
-                    : Container()),
-                SizedBox(
-                  height: 10.h,
-                ),
+                    : Container(height: 10.h)),
+                // SizedBox(
+                //   height: 10.h,
+                // ),
                 SizedBox(
                   height: 30.h,
                 ),

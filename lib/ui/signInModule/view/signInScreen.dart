@@ -5,6 +5,7 @@ import 'package:flutter/painting.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
+import 'package:get_storage/get_storage.dart';
 import 'package:visa_app/constants/appColor.dart';
 import 'package:visa_app/constants/appImages.dart';
 import 'package:visa_app/constants/stringConstants.dart';
@@ -28,6 +29,7 @@ class _SignInState extends State<SignIn> {
   // Node variables for initial check on textField on first tap
   FocusNode emailfocus = FocusNode();
   FocusNode passwordFocus = FocusNode();
+
 
   @override
   void initState() {
@@ -92,7 +94,11 @@ class _SignInState extends State<SignIn> {
                         padding: EdgeInsets.only(top: 15.h),
                         child: Align(
                           alignment: Alignment.topCenter,
-                          child: Image.asset(logo, height: 100.h, width: 100.h),
+                          child: Image.asset(
+                            new_logo,
+                            height: 120.h,
+                            width: 130.w,
+                          ),
                         ),
                       ),
                       Align(
@@ -120,7 +126,7 @@ class _SignInState extends State<SignIn> {
                                       controller.checkEmail(email);
                                     },
                                     textInputAction: TextInputAction.next,
-                                    textInputType: TextInputType.name),
+                                    textInputType: TextInputType.emailAddress),
                                 Obx(() => controller.emailError.value
                                     ? Text(
                                         controller.emailValidationMessage.value,
