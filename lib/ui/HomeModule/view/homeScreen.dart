@@ -5,6 +5,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/painting.dart';
 import 'package:flutter/rendering.dart';
+import 'package:flutter/scheduler.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
@@ -12,6 +13,7 @@ import 'package:get/get_core/src/get_main.dart';
 import 'package:get/get_state_manager/src/rx_flutter/rx_obx_widget.dart';
 import 'package:visa_app/constants/appColor.dart';
 import 'package:visa_app/constants/appImages.dart';
+import 'package:visa_app/constants/constants.dart';
 import 'package:visa_app/ui/HomeModule/conotroller/homeController.dart';
 import 'package:visa_app/ui/HomeModule/model/countryModel.dart';
 import 'package:visa_app/ui/applyVisaFirstStepModule/view/selectVisaPlanScreen.dart';
@@ -27,6 +29,7 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   String? _countryDropDownName = "UAE";
+
   List<String> countryNameList = <String>[
     "UAE",
   ];
@@ -37,10 +40,21 @@ class _HomePageState extends State<HomePage> {
   FocusNode nationalityFocus = FocusNode();
 
   @override
-  void initState() {
+  void initState()  {
     super.initState();
-    controller.getCountryListApi("");
+    SchedulerBinding.instance!.addPostFrameCallback((timeStamp) async {
+      bool isOnline = await hasNetwork();
+      if(isOnline)  {
+        controller.getCountryListApi();
+      }
+      else{
+        Get.snackbar("oops..","Internet not avaliable");
+      }
+
+    });
+
   }
+
   @override
   void dispose() {
     // TODO: implement dispose
@@ -302,9 +316,8 @@ class _HomePageState extends State<HomePage> {
                                                                         onChanged: (value){
                                                                           print("api call");
                                                                           controller.serchValue=value;
-                                                                          controller.getCountryListApi(value);
+                                                                          controller.getCountryListApi();
                                                                         },
-
                                                                         decoration: InputDecoration(
                                                                           border: InputBorder.none,),
                                                                       ),
@@ -327,7 +340,7 @@ class _HomePageState extends State<HomePage> {
                                                                 height: 10.h,
                                                               ),
                                                              Obx(()=> Container(
-                                                                height: 300.h,
+                                                                height: 250.h,
                                                                 width: 200.h,
                                                                 child: ListView.builder(
                                                                     shrinkWrap: true,
@@ -445,11 +458,19 @@ class _HomePageState extends State<HomePage> {
                                             }
                                            else {
                                               controller.countryDropDownName.value="";
+                                              controller.serchValue="";
+
+                                              // Navigator.push(context,MaterialPageRoute(builder: (context)=> SelectVisaPlanPage(
+                                              //   selectedCountry: selectedCountry,
+                                              // )))
+
                                               Get.to(SelectVisaPlanPage(
                                                 selectedCountry: selectedCountry,
-                                              ));
+                                              ))!.then((value) =>  controller.getCountryListApi());
+                                              selectedCountry="";
                                             }
                                           }),
+
                                     ],
                                   ),
                                 ),
@@ -460,6 +481,7 @@ class _HomePageState extends State<HomePage> {
                       ),
                     ),
             ),
+
             bottomNavigationBar: CommonBottomNavigation()),
       ),
     );

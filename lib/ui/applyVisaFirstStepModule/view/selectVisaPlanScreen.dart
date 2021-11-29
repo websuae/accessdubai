@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:carousel_slider/carousel_options.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/cupertino.dart';
@@ -7,6 +9,7 @@ import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:visa_app/constants/appColor.dart';
 import 'package:visa_app/constants/appImages.dart';
+import 'package:visa_app/constants/constants.dart';
 import 'package:visa_app/constants/sharePrefConstants.dart';
 import 'package:visa_app/ui/applyVisaFirstStepModule/controller/ApplyVisaFirstStepController.dart';
 import 'package:visa_app/ui/applyVisaModule/view/applyVisaScreen.dart';
@@ -42,12 +45,19 @@ class _SelectVisaPlanPage extends State<SelectVisaPlanPage> {
       setState(() {
 
       });
-
+      bool isOnline = await hasNetwork();
+      if(isOnline)  {
+        controller.selectedCountryId=widget.selectedCountry;
+        controller.applyVisaFirstStepApi();
+      }
+      else{
+        Get.snackbar("oops..","Internet not avaliable");
+      }
     });
-    print("widget id:"+widget.selectedCountry);
-    controller.selectedCountryId=widget.selectedCountry;
-    controller.applyVisaFirstStepApi();
+
+
   }
+
 
   @override
   Widget build(BuildContext context) {
@@ -364,7 +374,7 @@ class _SelectVisaPlanPage extends State<SelectVisaPlanPage> {
                             ),
                           ),
                         );
-                      }):Center(child: CircularProgressIndicator())),
+                      }):controller.loader.value?Center(child: CircularProgressIndicator()):Container()),
                 ),
               ],
             ),

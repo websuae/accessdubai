@@ -65,6 +65,34 @@
             </list>
           </value>
         </entry>
+        <entry key="connectivity">
+          <value>
+            <list>
+              <option value="$USER_HOME$/Downloads/flutter/.pub-cache/hosted/pub.dartlang.org/connectivity-3.0.6/lib" />
+            </list>
+          </value>
+        </entry>
+        <entry key="connectivity_for_web">
+          <value>
+            <list>
+              <option value="$USER_HOME$/Downloads/flutter/.pub-cache/hosted/pub.dartlang.org/connectivity_for_web-0.4.0+1/lib" />
+            </list>
+          </value>
+        </entry>
+        <entry key="connectivity_macos">
+          <value>
+            <list>
+              <option value="$USER_HOME$/Downloads/flutter/.pub-cache/hosted/pub.dartlang.org/connectivity_macos-0.2.1+2/lib" />
+            </list>
+          </value>
+        </entry>
+        <entry key="connectivity_platform_interface">
+          <value>
+            <list>
+              <option value="$USER_HOME$/Downloads/flutter/.pub-cache/hosted/pub.dartlang.org/connectivity_platform_interface-2.0.1/lib" />
+            </list>
+          </value>
+        </entry>
         <entry key="country_code_picker">
           <value>
             <list>
@@ -672,6 +700,10 @@
       <root url="file://$USER_HOME$/Downloads/flutter/.pub-cache/hosted/pub.dartlang.org/chewie_audio-1.2.0/lib" />
       <root url="file://$USER_HOME$/Downloads/flutter/.pub-cache/hosted/pub.dartlang.org/clock-1.1.0/lib" />
       <root url="file://$USER_HOME$/Downloads/flutter/.pub-cache/hosted/pub.dartlang.org/collection-1.15.0/lib" />
+      <root url="file://$USER_HOME$/Downloads/flutter/.pub-cache/hosted/pub.dartlang.org/connectivity-3.0.6/lib" />
+      <root url="file://$USER_HOME$/Downloads/flutter/.pub-cache/hosted/pub.dartlang.org/connectivity_for_web-0.4.0+1/lib" />
+      <root url="file://$USER_HOME$/Downloads/flutter/.pub-cache/hosted/pub.dartlang.org/connectivity_macos-0.2.1+2/lib" />
+      <root url="file://$USER_HOME$/Downloads/flutter/.pub-cache/hosted/pub.dartlang.org/connectivity_platform_interface-2.0.1/lib" />
       <root url="file://$USER_HOME$/Downloads/flutter/.pub-cache/hosted/pub.dartlang.org/country_code_picker-2.0.2/lib" />
       <root url="file://$USER_HOME$/Downloads/flutter/.pub-cache/hosted/pub.dartlang.org/csslib-0.17.1/lib" />
       <root url="file://$USER_HOME$/Downloads/flutter/.pub-cache/hosted/pub.dartlang.org/cupertino_icons-1.0.4/lib" />

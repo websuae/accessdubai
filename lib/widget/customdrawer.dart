@@ -14,6 +14,7 @@ import 'package:visa_app/ui/FAQModule/view/FAQScreen.dart';
 import 'package:visa_app/ui/chatWithUsModule/view/chatWithUsScreen.dart';
 import 'package:visa_app/ui/contactUsModule/view/contactUsScreen.dart';
 import 'package:visa_app/ui/howToApplyModule/view/howToApplyScreen.dart';
+import 'package:visa_app/ui/privacyPolicyModule/view/privacyPolicyScreen.dart';
 import 'package:visa_app/ui/signInModule/view/signInScreen.dart';
 import 'package:visa_app/ui/typesOfVisaModule/view/typesOfVisaScreen.dart';
 import 'package:visa_app/ui/whyUsModule/view/whyUsScreen.dart';
@@ -208,7 +209,7 @@ class _CustomDrawerState extends State<CustomDrawer> {
                   ),
                 ),
                 drawerWidget("Privacy Policy",Image.asset(privacyPolicyImage,), () {
-                  Get.to(ContactUsPage());
+                  Get.to(PrivacyPolicyPage());
                 }),
                 Padding(
                   padding: EdgeInsets.all(8.0),

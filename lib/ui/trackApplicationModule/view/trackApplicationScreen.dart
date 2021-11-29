@@ -1,11 +1,13 @@
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:visa_app/constants/appColor.dart';
 import 'package:visa_app/constants/appImages.dart';
+import 'package:visa_app/constants/constants.dart';
 import 'package:visa_app/ui/applyVisaModule/controller/applyVisaController.dart';
 import 'package:visa_app/ui/trackApplicationModule/controller/TrackApplicationController.dart';
 import 'package:visa_app/widget/commonAppBar.dart';
@@ -36,10 +38,20 @@ class _TrackApplicationPageState extends State<TrackApplicationPage> {
   void initState() {
     // TODO: implement initState
     super.initState();
-    if(widget.applicationNumber != "") {
-      trackController.applicationNumberController.text = widget.applicationNumber!;
-      trackController.doTrackingApi();
-    }
+    SchedulerBinding.instance!.addPostFrameCallback((timeStamp) async {
+      bool isOnline = await hasNetwork();
+      if(isOnline)  {
+        if(widget.applicationNumber != "") {
+          trackController.applicationNumberController.text = widget.applicationNumber!;
+          trackController.doTrackingApi();
+        }
+      }
+      else{
+        Get.snackbar("oops..","Internet not avaliable");
+      }
+
+    });
+
   }
 
 
@@ -136,9 +148,16 @@ class _TrackApplicationPageState extends State<TrackApplicationPage> {
                             ),
                           ),
                           GestureDetector(
-                            onTap: (){
+                            onTap: () async {
                               print("Response");
-                              trackController.doTrackingApi();
+                              bool isOnline = await hasNetwork();
+                              if(isOnline)  {
+                                trackController.doTrackingApi();
+                              }
+                              else{
+                                Get.snackbar("oops..","Internet not avaliable");
+                              }
+
                             },
                             child: Align(
                               alignment: Alignment.centerRight,

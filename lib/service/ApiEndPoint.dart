@@ -11,4 +11,8 @@ class ApiEndpoint {
   static String applyForVisa = baseUrl + "/Users/applyForVisa";
   static String tracking = baseUrl + "/Users/checkApplicationStatus";
   static String faq = baseUrl + "/Users/faq";
+  static String contactUs = baseUrl + "/Users/contact_us";
+  static String whyUs = baseUrl + "/Users/why_us";
+  static String getCountryVisaPrice = baseUrl + "/Users/get_cuntries_visa_price";
+  static String getPrivacyPolicy = baseUrl + "/Users/privacy_policy";
 }

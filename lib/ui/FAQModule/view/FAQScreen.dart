@@ -1,9 +1,11 @@
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:visa_app/constants/appColor.dart';
 import 'package:visa_app/constants/appImages.dart';
+import 'package:visa_app/constants/constants.dart';
 import 'package:visa_app/ui/FAQModule/controller/faqController.dart';
 import 'package:visa_app/ui/applyVisaModule/view/expandableListViewScreen.dart';
 import 'package:visa_app/widget/commonAppBar.dart';
@@ -19,14 +21,20 @@ class FAQPage extends StatefulWidget {
 class _FAQPageState extends State<FAQPage> {
   FaqController controller = Get.put(FaqController());
 
-
-
   @override
   void initState() {
     super.initState();
+    SchedulerBinding.instance!.addPostFrameCallback((timeStamp) async {
+      bool isOnline = await hasNetwork();
+      if(isOnline)  {
+        controller.faqApi();
+      }
+      else{
+        Get.snackbar("oops..","Internet not avaliable");
+      }
 
+    });
 
-    controller.faqApi();
   }
 
   @override
@@ -96,9 +104,12 @@ class _FAQPageState extends State<FAQPage> {
                     ],
                   ),
         Obx(
-              () => controller.faqList != null &&
+              () =>
+
+              controller.faqList != null &&
               controller.faqList.length > 0
               ?
+
                   ListView.builder(
                       shrinkWrap: true,
                       physics:NeverScrollableScrollPhysics(),
@@ -112,7 +123,7 @@ class _FAQPageState extends State<FAQPage> {
                             ans: controller.faqList[index].fans.toString(),
                           )),
                         );
-                      }):Container())
+                      }): controller.loader.value?Center(child: CircularProgressIndicator()):Container())
                 ],
               ),
             ),

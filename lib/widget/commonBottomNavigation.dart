@@ -95,7 +95,7 @@ class _CommonBottomNavigationState extends State<CommonBottomNavigation> {
                 );
               },
               child: Image.asset(
-                contactUsImage,
+                contactUsBrownImage,
                 height: 25.h,
                 width: 60.w,
                 color: Color(0xff0176DA),

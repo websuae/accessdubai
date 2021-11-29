@@ -9,10 +9,11 @@ class HomeController extends GetxController {
   var countryList = [].obs;
   var countryList1 = [].obs;
   late CountryResponse country;
-  var loader = true.obs;
+  var loader = false.obs;
   String serchValue="";
 
-  getCountryListApi(String serchValue) {
+  getCountryListApi() {
+    loader.value=true;
     Map<String, dynamic> map = Map<String, dynamic>();
     map["search"] = serchValue;
       print("Search:"+serchValue);

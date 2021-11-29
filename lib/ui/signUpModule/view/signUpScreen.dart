@@ -9,6 +9,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:visa_app/constants/appColor.dart';
 import 'package:visa_app/constants/appImages.dart';
+import 'package:visa_app/constants/constants.dart';
 import 'package:visa_app/constants/stringConstants.dart';
 import 'package:visa_app/model/Nationality.dart';
 import 'package:visa_app/ui/signInModule/view/signInScreen.dart';
@@ -351,9 +352,16 @@ class _SignUpState extends State<SignUp> {
                       ),
                     ),
                     onTap: controller.isValidValidation.value
-                        ? () {
-                            controller.loader.value = true;
-                            controller.doSignUpApi();
+                        ? () async {
+                      bool isOnline = await hasNetwork();
+                      if(isOnline)  {
+                        controller.loader.value = true;
+                        controller.doSignUpApi();
+                      }
+                      else{
+                        Get.snackbar("oops..","Internet not avaliable");
+                      }
+
                           }
                         : null,
                   ),

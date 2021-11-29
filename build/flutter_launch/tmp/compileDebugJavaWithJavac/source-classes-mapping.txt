@@ -1,0 +1,2 @@
+br/com/thyagoluciano/flutter_launch/BuildConfig.java
+ br.com.thyagoluciano.flutter_launch.BuildConfig

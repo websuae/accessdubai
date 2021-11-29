@@ -56,6 +56,30 @@
       "languageVersion": "2.12"
     },
     {
+      "name": "connectivity",
+      "rootUri": "file:///C:/Users/hp/Downloads/flutter/.pub-cache/hosted/pub.dartlang.org/connectivity-3.0.6",
+      "packageUri": "lib/",
+      "languageVersion": "2.12"
+    },
+    {
+      "name": "connectivity_for_web",
+      "rootUri": "file:///C:/Users/hp/Downloads/flutter/.pub-cache/hosted/pub.dartlang.org/connectivity_for_web-0.4.0+1",
+      "packageUri": "lib/",
+      "languageVersion": "2.12"
+    },
+    {
+      "name": "connectivity_macos",
+      "rootUri": "file:///C:/Users/hp/Downloads/flutter/.pub-cache/hosted/pub.dartlang.org/connectivity_macos-0.2.1+2",
+      "packageUri": "lib/",
+      "languageVersion": "2.12"
+    },
+    {
+      "name": "connectivity_platform_interface",
+      "rootUri": "file:///C:/Users/hp/Downloads/flutter/.pub-cache/hosted/pub.dartlang.org/connectivity_platform_interface-2.0.1",
+      "packageUri": "lib/",
+      "languageVersion": "2.12"
+    },
+    {
       "name": "country_code_picker",
       "rootUri": "file:///C:/Users/hp/Downloads/flutter/.pub-cache/hosted/pub.dartlang.org/country_code_picker-2.0.2",
       "packageUri": "lib/",
@@ -572,7 +596,7 @@
       "languageVersion": "2.12"
     }
   ],
-  "generated": "2021-11-15T09:13:39.515279Z",
+  "generated": "2021-11-29T05:06:46.813910Z",
   "generator": "pub",
   "generatorVersion": "2.14.0"
 }

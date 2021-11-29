@@ -30,8 +30,6 @@ class _CompanySignUpState extends State<CompanySignUp> {
 
   var strNoFileChose = "No File chosen";
 
-  List<String> countryList = <String>['+91', '+92', '+93', '+94', '+95', '+96'];
-
   // Node variables for initial check on textField on first tap
   FocusNode companyTitleFocus = FocusNode();
   FocusNode companyEmailFocus = FocusNode();

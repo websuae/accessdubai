@@ -1,9 +1,15 @@
 import 'package:carousel_slider/carousel_options.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
+import 'package:flutter_html/flutter_html.dart';
+import 'package:flutter_html/style.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:get/get.dart';
 import 'package:visa_app/constants/appColor.dart';
 import 'package:visa_app/constants/appImages.dart';
+import 'package:visa_app/constants/constants.dart';
+import 'package:visa_app/ui/whyUsModule/controller/whyUsController.dart';
 import 'package:visa_app/widget/commonAppBar.dart';
 
 class WhyUsPage extends StatefulWidget {
@@ -15,8 +21,7 @@ class _WhyUsPageState extends State<WhyUsPage> {
   List<WhyUsList> whyUSList = <WhyUsList>[];
 
   bool descTextShowFlag = false;
-  String text =
-      "Dusk Travel and Tourism is the leader in UAE visa and travel since 2005. We are established unequivocally as Dubai’s premier online travel company. Our technology continually evolves to align with the ever-changing demands of our clients. A highly proactive team of experts is at your service, offering assistance in your travel prerequisite and UAE visa application. Our comprehensive travel-related services include airline booking, UAE visa application, hotel bookings, staycations, holiday packages, activities and ancillary services. We ensure all our clients have a smooth and enjoyable experience with us. Customer service is accessible round-the-clock. In addition, we are available 24/7 on live chat support to guide you on queries about our trusted travel services for UAE visas \nWe are the top choice for your travel and UAE Visa processing due to our excellent service and xpertise experience. Over 1.5 million satisfied customers from around the globe have great things to say about us. We work the highest standard of integrity and providing unparalleled customer service. We remain committed to our business ethics, always prioritising the needs of our clients. Try our services today and enjoy the signature professionalism, personalised care and attention.";
+  WhyUsController controller = Get.put(WhyUsController());
 
   @override
   void initState() {
@@ -38,6 +43,17 @@ class _WhyUsPageState extends State<WhyUsPage> {
         title: "Safety & Security",
         description:
             "Your visa application will be treated with strictest confidence and all your personal and professional documents are safe with us."));
+    SchedulerBinding.instance!.addPostFrameCallback((timeStamp) async {
+      bool isOnline = await hasNetwork();
+      if(isOnline)  {
+        controller.whyUsApi();
+      }
+      else{
+        Get.snackbar("oops..","Internet not avaliable");
+      }
+
+    });
+
   }
 
   @override
@@ -61,7 +77,8 @@ class _WhyUsPageState extends State<WhyUsPage> {
         ],
       ),
       body: SingleChildScrollView(
-        child: Container(
+        child:
+      Container(
           child: Column(
             children: [
               Stack(
@@ -105,7 +122,8 @@ class _WhyUsPageState extends State<WhyUsPage> {
                   )
                 ],
               ),
-              SingleChildScrollView(
+          Obx(()=>controller.loader.value?Center(child: CircularProgressIndicator()):
+          controller.whyUsResponse != null && controller.whyUsResponse.data != null? SingleChildScrollView(
                 physics: NeverScrollableScrollPhysics(),
                 child: Column(
                   children: [
@@ -189,9 +207,22 @@ class _WhyUsPageState extends State<WhyUsPage> {
                       alignment: Alignment.centerLeft,
                       child: Padding(
                         padding: EdgeInsets.only(left: 10.h, top: 15.h),
-                        child: Text(text,
-                            maxLines: descTextShowFlag ? 35 : 3,
-                            textAlign: TextAlign.start),
+                        child:
+                        Html(
+                          data: controller.whyUsResponse.data![0].pageContent.toString()
+                              .toString(),
+                          style: {
+                            '#': Style(
+                              fontSize: FontSize(18),
+                              maxLines: descTextShowFlag
+                                  ? 35
+                                  : 3,
+                              textOverflow:
+                              TextOverflow.ellipsis,
+                            ),
+                          },
+                        ),
+
                       ),
                     ),
                     InkWell(
@@ -302,12 +333,12 @@ class _WhyUsPageState extends State<WhyUsPage> {
                     )
                   ],
                 ),
-              ),
+              ):Container(),)
             ],
           ),
-        ),
+        )
       ),
-    )
+    ),
         // WebView(
         //   javascriptMode: JavascriptMode.unrestricted,
         //   initialUrl: 'https://accessdubai.dusktours.com/about-us',

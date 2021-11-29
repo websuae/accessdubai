@@ -65,12 +65,20 @@ class _ApplyVisaPageState extends State<ApplyVisaPage> {
 
   @override
   void initState() {
-    controller.getCountryListApi();
+
+
     WidgetsBinding.instance!.addPostFrameCallback((_) async {
       await getBoolValuesSF();
       setState(() {});
 
       print("username value:" + controller.userIds.toString());
+      bool isOnline = await hasNetwork();
+      if(isOnline)  {
+        controller.getCountryListApi();
+      }
+      else{
+        Get.snackbar("oops..","Internet not avaliable");
+      }
     });
     super.initState();
     print("visa plan id:" + widget.visatypeId);
@@ -104,6 +112,14 @@ class _ApplyVisaPageState extends State<ApplyVisaPage> {
         controller.checkName(controller.lastNameController.text);
       });
     });
+  }
+  @override
+  void dispose() {
+    // TODO: implement dispose
+    super.dispose();
+    controller.dynamicList.clear();
+    controller.updateValue.value=false;
+    controller.dateController.text="";
   }
 
   @override
@@ -233,7 +249,8 @@ class _ApplyVisaPageState extends State<ApplyVisaPage> {
                   ),
                 ),
         ),
-        bottomNavigationBar: controller.childWidgetLength.value > 0
+        bottomNavigationBar: controller.dynamicList
+            .length > 0
             ? Column(
                 mainAxisSize: MainAxisSize.min,
                 mainAxisAlignment: MainAxisAlignment.end,
@@ -261,90 +278,67 @@ class _ApplyVisaPageState extends State<ApplyVisaPage> {
                       height: 35.h,
                       width: MediaQuery.of(context).size.width,
                       child: ElevatedButton(
-                        onPressed: () {
+                        onPressed: () async{
                           print("applyVisaNumberList length:" +
                               controller.dynamicList.length.toString());
-                          // Navigator.push(
-                          //  context,
-                          //  MaterialPageRoute(
-                          //      builder: (context) =>
-                          //          (TrackApplicationPage())));
-                          if (controller.dynamicList.length > 0) {
-                            if(controller.dynamicList[0].CountryId != "") {
-                              controller.doApplyVisa(
+                          bool isOnline = await hasNetwork();
+                          if(isOnline)  {
+                            if (controller.dynamicList.length > 0) {
+                              if (controller.dynamicList[0].CountryId != "") {
+                                controller.doApplyVisa(
                                   controller.prefix,
                                   controller.dynamicList.length,
                                   int.parse(controller.userIds),
                                   controller.dynamicList[0].title.toString(),
-                                  controller.dynamicList[0].firstName
-                                      .toString(),
+                                  controller.dynamicList[0].firstName.toString(),
                                   controller.dynamicList[0].lastName.toString(),
                                   controller.dynamicList[0].CountryName
                                       .toString(),
                                   int.parse(controller.dynamicList[0].CountryId
                                       .toString()),
-                                  controller.dateController.text.toString(),
-
-                                  controller.dynamicList[0].visapathPassportSizePhoto!.paths
-                                      .first
+                                  controller.dynamicList[0].travelDate.toString(),
+                                  controller.dynamicList[0]
+                                      .visapathPassportSizePhoto!.paths.first
                                       .toString(),
-
-                                controller.dynamicList[0].CountryName=="India"?""
-                                    :controller.dynamicList[0].visapathColoredPassport!.paths
-                                    .first
-                                    .toString(),
-
-
-                                controller.dynamicList[0].CountryName=="India"?
-                                controller.dynamicList[0].visapathIndiaFirst!.paths.first
-                                    .toString():"",
-
-
-                                controller.dynamicList[0].CountryName=="India"?
-                                controller.dynamicList[0].visapathIndiaLast!.paths.first
-                                    .toString():"",
-
-
-                                controller.dynamicList[0].CountryName=="Pakistan"?
-                                controller.dynamicList[0].visapathPakistanFront!.paths
-                                      .first
-                                      .toString():"",
-
-
-                                controller.dynamicList[0].CountryName=="Pakistan"?
-                                controller.dynamicList[0].visapathPakistanBack!.paths
-                                    .first
-                                    .toString():"",);
+                                  controller.dynamicList[0].CountryName == "India"
+                                      ? ""
+                                      : controller.dynamicList[0]
+                                      .visapathColoredPassport!.paths.first
+                                      .toString(),
+                                  controller.dynamicList[0].CountryName == "India"
+                                      ? controller.dynamicList[0]
+                                      .visapathIndiaFirst!.paths.first
+                                      .toString()
+                                      : "",
+                                  controller.dynamicList[0].CountryName == "India"
+                                      ? controller.dynamicList[0]
+                                      .visapathIndiaLast!.paths.first
+                                      .toString()
+                                      : "",
+                                  controller.dynamicList[0].CountryName ==
+                                      "Pakistan"
+                                      ? controller.dynamicList[0]
+                                      .visapathPakistanFront!.paths.first
+                                      .toString()
+                                      : "",
+                                  controller.dynamicList[0].CountryName ==
+                                      "Pakistan"
+                                      ? controller.dynamicList[0]
+                                      .visapathPakistanBack!.paths.first
+                                      .toString()
+                                      : "",
+                                );
+                              } else {
+                                Get.snackbar("Alert..", "Please select country");
+                              }
+                            } else {
+                              Get.snackbar("Alert", "Must apply for 1 visa");
                             }
-                            else{
-                              Get.snackbar("Alert..", "Please select country");
-                            }
-                          } else {
-                            Get.snackbar("Alert", "Must apply for 1 visa");
                           }
-                          // for(int i=0;i<controller.dynamicList.length;i++)
-                          //   {
-                          //   controller.doApplyVisa(30,
-                          //       controller.dynamicList.length,
-                          //      int.parse(userIds),
-                          //       controller.dynamicList[i].title.toString(),
-                          //       controller.dynamicList[i].firstName.toString(),
-                          //       controller.dynamicList[i].lastName.toString(),
-                          //       controller.dynamicList[i].CountryName.toString(),
-                          //      int.parse(controller.dynamicList[i].CountryId.toString()),
-                          //      controller.dateController.text.toString(),
-                          //      "",
-                          //      "",
-                          //      "",
-                          //      "",
-                          //      "",
-                          //      "");
-                          //   }
-                          /* Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (context) =>
-                                        (TrackApplicationPage())));*/
+                          else{
+                            Get.snackbar("oops..","Internet not avaliable");
+                          }
+
                         },
                         child: Text(
                           "PROCEED",
@@ -426,19 +420,23 @@ class _ApplyVisaPageState extends State<ApplyVisaPage> {
                                 lastName: "",
                                 CountryId: "",
                                 CountryName: "",
-                                travelDate: "",
+                                countryPrice: "",
+                                travelDate: "Date of Travel",
                                 imageColoredPassport: "Colored Passport",
                                 imagePassportSizePhoto: "Passport Size Photo",
                                 imageIndiaFirst: "Colored Passport(First Page)",
                                 imageIndiaLast: "Colored Passport(Last Page)",
-                                imagePakistanFront: "Pakistan National ID(Front)",
+                                imagePakistanFront:
+                                    "Pakistan National ID(Front)",
                                 imagePakistanBack: "Pakistan National ID(Back)",
                                 visapathColoredPassport: null,
                                 visapathPassportSizePhoto: null,
                                 visapathIndiaFirst: null,
                                 visapathIndiaLast: null,
                                 visapathPakistanFront: null,
-                                visapathPakistanBack: null));
+                                visapathPakistanBack: null,
+
+                            ));
                           }
                           print(
                               "i:" + controller.dynamicList.length.toString());
@@ -459,6 +457,7 @@ class _ApplyVisaPageState extends State<ApplyVisaPage> {
   }
 
   Future<void> _selectDate(BuildContext context, int index) async {
+
     final DateTime? pickedDate = await showDatePicker(
         context: context,
         initialDate: currentDate,
@@ -467,9 +466,10 @@ class _ApplyVisaPageState extends State<ApplyVisaPage> {
     if (pickedDate != null && pickedDate != currentDate)
       setState(() {
         currentDate = pickedDate;
-        controller.dateController.text =
-            DateFormat('dd-MM-yyyy').format(currentDate);
-        //dynamicList[index].travelDate=DateFormat('dd-MM-yyyy').format(currentDate);
+        controller.dateController.text = DateFormat('dd-MM-yyyy').format(currentDate);
+
+       controller.dynamicList[index].travelDate=DateFormat('dd-MM-yyyy').format(currentDate);
+       // controller.dynamicList[index].controller!.text=DateFormat('dd-MM-yyyy').format(currentDate);
       });
   }
 
@@ -477,6 +477,7 @@ class _ApplyVisaPageState extends State<ApplyVisaPage> {
     return Padding(
       padding: EdgeInsets.only(left: 10.w, right: 10.w, top: 5.h, bottom: 10.h),
       child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Container(
             height: 25.h,
@@ -614,11 +615,12 @@ class _ApplyVisaPageState extends State<ApplyVisaPage> {
                                 countryName.countryName.toString();
                             controller.dynamicList[index].CountryId =
                                 countryName.countryId.toString();
+                            controller.updateValue.value=false;
+                            controller.getCountryVisaPriceApi(context,controller.dynamicList[index].CountryId.toString(),widget.visatypeId,index);
+
                           });
                         },
-                      )
-
-                      );
+                      ));
                 } else {
                   return Container(
                     color: Colors.red,
@@ -628,28 +630,65 @@ class _ApplyVisaPageState extends State<ApplyVisaPage> {
           SizedBox(
             height: 10.h,
           ),
-          CommonSignUpTextField(
-              context: context,
-              hintText: dateHintText,
-              maxLine: 1,
-              isDivider: false,
-              onTap: () {
-                FocusScope.of(context).unfocus();
-                _selectDate(context, index);
-              },
-              isShowCursor: false,
-              // binding Getx Controller to textField controller
-              controller: controller.dateController,
-              textInputAction: TextInputAction.done,
-              textInputType: TextInputType.datetime),
-          Obx(
-            () => controller.dateError.value
-                ? Text(
-                    controller.dateValidationMessage.value,
-                    style: TextStyle(color: Colors.red),
-                  )
-                : Container(),
+          Obx(()=>
+              controller.updateValue.value?
+              Text(
+              controller.dynamicList[index].countryPrice.toString() ,
+              style: TextStyle(
+                  color: colorBlack,
+                  fontSize: 16.sp,
+                  fontWeight: FontWeight.bold),
+            ):SizedBox()),
+          SizedBox(
+            height: 10.h,
           ),
+          GestureDetector(
+            onTap: (){
+              _selectDate(context, index);
+            },
+            child: Container(
+              width: MediaQuery.of(context).size.width,
+              decoration: BoxDecoration(borderRadius: BorderRadius.circular(15), border: Border.all(color: Colors.grey[300]!, width: .4)),
+              child: Padding(
+                padding: EdgeInsets.all(12.h),
+                child: Text(controller.dynamicList[index].travelDate.toString(),style:
+                controller.dynamicList[index].travelDate=="Date of Travel"?
+                TextStyle(
+                    color: Colors.grey.shade500,
+                    fontSize: 15.sp,
+                    fontWeight: FontWeight.normal):TextStyle(
+                    fontSize: 14.sp, color: Colors.black),),
+              ),
+            ),
+          ),
+          SizedBox(
+            height: 15.h,
+          ),
+          // CommonSignUpTextField(
+          //     context: context,
+          //     hintText: dateHintText,
+          //     maxLine: 1,
+          //     isDivider: false,
+          //     onTap: () {
+          //       FocusScope.of(context).unfocus();
+          //       _selectDate(context, index);
+          //     },
+          //     onChanged: (value){
+          //
+          //     },
+          //     isShowCursor: false,
+          //     // binding Getx Controller to textField controller
+          //     controller:controller.dateController,
+          //     textInputAction: TextInputAction.done,
+          //     textInputType: TextInputType.datetime),
+          // Obx(
+          //   () => controller.dateError.value
+          //       ? Text(
+          //           controller.dateValidationMessage.value,
+          //           style: TextStyle(color: Colors.red),
+          //         )
+          //       : Container(),
+          // ),
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -659,120 +698,10 @@ class _ApplyVisaPageState extends State<ApplyVisaPage> {
                 width: MediaQuery.of(context).size.width,
                 child: ElevatedButton(
                   onPressed: () async {
-                    picked = await FilePicker.platform.pickFiles(type: FileType.custom,
-                      allowedExtensions: ['jpg', 'jpeg', 'png','JPEG'],);
-                    if (picked == null) {
-                      Center(child: CircularProgressIndicator());
-                    } else {
-                      print(picked.files.first.name != null &&
-                          picked.files.first.name != ""
-                          ? picked.files.first.name
-                          : "");
-                      setState(() {
-                        controller.dynamicList[index].imagePassportSizePhoto =
-                            picked.files.first.name;
-                        controller.dynamicList[index].visapathPassportSizePhoto= picked;
-                      });
-                    }
-                  },
-                  child: Icon(Icons.cloud_upload),
-                  style: ElevatedButton.styleFrom(
-                    primary: colorBlue,
-                    shape: new RoundedRectangleBorder(
-                      borderRadius: new BorderRadius.circular(30.0),
-                    ),
-                  ),
-                ),
-              ),
-              Padding(
-                padding: EdgeInsets.all(8.r),
-                child: Row(
-                  children: [
-                    Text(controller.dynamicList[index].imagePassportSizePhoto.toString(),
-                        style: TextStyle(fontSize: 14.sp)),
-                    SizedBox(
-                      width: 5.w,
-                    ),
-                    GestureDetector(
-                      onTap: (){
-                        showDialog<String>(
-                          context: context,
-                          builder: (BuildContext context) => AlertDialog(
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.all(
-                                Radius.circular(20),
-                              ),
-                            ),
-                            content: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              mainAxisAlignment: MainAxisAlignment.start,
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                Text("PASSPORT VALIDITY NOT LESS THAN 6 MONTHS",style: TextStyle(color: Colors.red,fontSize: 20.sp),textAlign: TextAlign.start,),
-                                SizedBox(height: 20.h,),
-                                Text("Step 1: Get a passport sized picture with a white background and take a picture of it.Make sure the picture is in focus *Do not take a selfie.",style: TextStyle(color: Colors.black,fontSize: 16.sp),textAlign: TextAlign.start,),
-                                SizedBox(height: 5.h,),
-                                Text("Step 2: Adjust and crop the picture to include the border around it.",style: TextStyle(color: Colors.black,fontSize: 16.sp),textAlign: TextAlign.start,),
-                                SizedBox(height: 5.h,),
-                                Text("Step 3: Final image should look like the image sample below",style: TextStyle(color: Colors.black,fontSize: 16.sp),textAlign: TextAlign.start,),
-                                SizedBox(height: 5.h,),
-                                Text("Size width 620px by height 800px",style: TextStyle(color: Colors.black,fontSize: 16.sp, fontWeight: FontWeight.bold),textAlign: TextAlign.start,),
-                                SizedBox(height: 5.h,),
-                                Align(alignment: Alignment.center,
-                                    child: Image.asset(passportPhoto)),
-                                SizedBox(height: 10.h,),
-                                GestureDetector(
-                                  onTap: (){
-                                    Navigator.pop(context);
-                                  },
-                                  child: Container(
-                                    padding:
-                                    EdgeInsets.only(left: 10.w, right: 10.w),
-                                    height: 40.h,
-                                    width:
-                                    MediaQuery.of(context).size.width / 1.5,
-                                    decoration: BoxDecoration(
-                                        borderRadius: BorderRadius.circular(12),
-                                        color: colorYellow),
-                                    child: Center(
-                                      child: Text(
-                                        "OK",
-                                        style: TextStyle(
-                                            fontSize: 14.sp,
-                                            color: colorWhite,
-                                            fontWeight: FontWeight.bold),
-                                      ),
-                                    ),
-                                  ),
-                                )
-
-                              ],
-                            ),
-                          ),
-                        );
-                      },
-                      child: Image.asset(
-                        helpImage,
-                        height: 18.h,
-                        width: 18.h,
-                      ),
-                    )
-                  ],
-                ),
-              )
-            ],
-          ),
-          controller.dynamicList[index].CountryName=="India"?SizedBox():Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Container(
-                //decoration: BoxDecoration(borderRadius: BorderRadius.circular(40),color:colorBlue),
-                height: 35.h,
-                width: MediaQuery.of(context).size.width,
-                child: ElevatedButton(
-                  onPressed: () async {
-                    picked = await FilePicker.platform.pickFiles(type: FileType.custom,
-                      allowedExtensions: ['jpg', 'jpeg', 'png',"JPEG"],);
+                    picked = await FilePicker.platform.pickFiles(
+                      type: FileType.custom,
+                      allowedExtensions: ['jpg', 'jpeg', 'png', 'JPEG'],
+                    );
                     if (picked == null) {
                       Center(child: CircularProgressIndicator());
                     } else {
@@ -780,12 +709,11 @@ class _ApplyVisaPageState extends State<ApplyVisaPage> {
                               picked.files.first.name != ""
                           ? picked.files.first.name
                           : "");
-                      controller.dynamicList[index].visapathColoredPassport = picked;
-
                       setState(() {
-                        controller.dynamicList[index].imageColoredPassport =
+                        controller.dynamicList[index].imagePassportSizePhoto =
                             picked.files.first.name;
-                        //  strNoFileChose = picked.files.first.name;
+                        controller.dynamicList[index]
+                            .visapathPassportSizePhoto = picked;
                       });
                     }
                   },
@@ -802,13 +730,15 @@ class _ApplyVisaPageState extends State<ApplyVisaPage> {
                 padding: EdgeInsets.all(8.r),
                 child: Row(
                   children: [
-                    Text(controller.dynamicList[index].imageColoredPassport.toString(),
+                    Text(
+                        controller.dynamicList[index].imagePassportSizePhoto
+                            .toString(),
                         style: TextStyle(fontSize: 14.sp)),
                     SizedBox(
                       width: 5.w,
                     ),
                     GestureDetector(
-                      onTap: (){
+                      onTap: () {
                         showDialog<String>(
                           context: context,
                           builder: (BuildContext context) => AlertDialog(
@@ -822,31 +752,69 @@ class _ApplyVisaPageState extends State<ApplyVisaPage> {
                               mainAxisAlignment: MainAxisAlignment.start,
                               mainAxisSize: MainAxisSize.min,
                               children: [
-                                Text("PASSPORT VALIDITY NOT LESS THAN 6 MONTHS",style: TextStyle(color: Colors.red,fontSize: 20.sp),textAlign: TextAlign.start,),
-                                SizedBox(height: 20.h,),
-                                Text("Step 1: Take a clear picture of the passport(First Page), make sure it is in focus",style: TextStyle(color: Colors.black,fontSize: 16.sp),textAlign: TextAlign.start,),
-                                SizedBox(height: 5.h,),
-                                Text("Step 2: Adjust and crop the picture to make sure to include the bottom two lines of the page.",style: TextStyle(color: Colors.black,fontSize: 16.sp),textAlign: TextAlign.start,),
-                                SizedBox(height: 5.h,),
-                                Text("Step 3: Final image should look like the image sample below",style: TextStyle(color: Colors.black,fontSize: 16.sp),textAlign: TextAlign.start,),
-                                SizedBox(height: 5.h,),
-                                Text("Size width 620px by height 800px",style: TextStyle(color: Colors.black,fontSize: 16.sp, fontWeight: FontWeight.bold),textAlign: TextAlign.start,),
-                                SizedBox(height: 5.h,),
-                                Text("*Passport Edges must be clear and visible*",style: TextStyle(color: Colors.black,fontSize: 16.sp),textAlign: TextAlign.start,),
-                                SizedBox(height: 5.h,),
-                                Align(alignment: Alignment.center,
-                                    child: Image.asset(passport)),
-                                SizedBox(height: 10.h,),
+                                Text(
+                                  "PASSPORT VALIDITY NOT LESS THAN 6 MONTHS",
+                                  style: TextStyle(
+                                      color: Colors.red, fontSize: 20.sp),
+                                  textAlign: TextAlign.start,
+                                ),
+                                SizedBox(
+                                  height: 20.h,
+                                ),
+                                Text(
+                                  "Step 1: Get a passport sized picture with a white background and take a picture of it.Make sure the picture is in focus *Do not take a selfie.",
+                                  style: TextStyle(
+                                      color: Colors.black, fontSize: 16.sp),
+                                  textAlign: TextAlign.start,
+                                ),
+                                SizedBox(
+                                  height: 5.h,
+                                ),
+                                Text(
+                                  "Step 2: Adjust and crop the picture to include the border around it.",
+                                  style: TextStyle(
+                                      color: Colors.black, fontSize: 16.sp),
+                                  textAlign: TextAlign.start,
+                                ),
+                                SizedBox(
+                                  height: 5.h,
+                                ),
+                                Text(
+                                  "Step 3: Final image should look like the image sample below",
+                                  style: TextStyle(
+                                      color: Colors.black, fontSize: 16.sp),
+                                  textAlign: TextAlign.start,
+                                ),
+                                SizedBox(
+                                  height: 5.h,
+                                ),
+                                Text(
+                                  "Size width 620px by height 800px",
+                                  style: TextStyle(
+                                      color: Colors.black,
+                                      fontSize: 16.sp,
+                                      fontWeight: FontWeight.bold),
+                                  textAlign: TextAlign.start,
+                                ),
+                                SizedBox(
+                                  height: 5.h,
+                                ),
+                                Align(
+                                    alignment: Alignment.center,
+                                    child: Image.asset(passportPhoto)),
+                                SizedBox(
+                                  height: 10.h,
+                                ),
                                 GestureDetector(
-                                  onTap: (){
+                                  onTap: () {
                                     Navigator.pop(context);
                                   },
                                   child: Container(
-                                    padding:
-                                    EdgeInsets.only(left: 10.w, right: 10.w),
+                                    padding: EdgeInsets.only(
+                                        left: 10.w, right: 10.w),
                                     height: 40.h,
                                     width:
-                                    MediaQuery.of(context).size.width / 1.5,
+                                        MediaQuery.of(context).size.width / 1.5,
                                     decoration: BoxDecoration(
                                         borderRadius: BorderRadius.circular(12),
                                         color: colorYellow),
@@ -861,7 +829,6 @@ class _ApplyVisaPageState extends State<ApplyVisaPage> {
                                     ),
                                   ),
                                 )
-
                               ],
                             ),
                           ),
@@ -878,454 +845,886 @@ class _ApplyVisaPageState extends State<ApplyVisaPage> {
               )
             ],
           ),
-          controller.dynamicList[index].CountryName=="India"?Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Container(
-                //decoration: BoxDecoration(borderRadius: BorderRadius.circular(40),color:colorBlue),
-                height: 35.h,
-                width: MediaQuery.of(context).size.width,
-                child: ElevatedButton(
-                  onPressed: () async {
-                    picked = await FilePicker.platform.pickFiles(type: FileType.custom,
-                      allowedExtensions: ['jpg', 'jpeg', 'png','JPEG'],);
-                    if (picked == null) {
-                      Center(child: CircularProgressIndicator());
-                    } else {
-                      print(picked.files.first.name != null &&
-                          picked.files.first.name != ""
-                          ? picked.files.first.name
-                          : "");
-                      setState(() {
-                        controller.dynamicList[index].imageIndiaFirst =
-                            picked.files.first.name;
-                        controller.dynamicList[index].visapathIndiaFirst = picked;
-                      });
-                    }
-                  },
-                  child: Icon(Icons.cloud_upload),
-                  style: ElevatedButton.styleFrom(
-                    primary: colorBlue,
-                    shape: new RoundedRectangleBorder(
-                      borderRadius: new BorderRadius.circular(30.0),
-                    ),
-                  ),
-                ),
-              ),
-              Padding(
-                padding: EdgeInsets.all(8.r),
-                child: Row(
+          controller.dynamicList[index].CountryName == "India"
+              ? SizedBox()
+              : Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(controller.dynamicList[index].imageIndiaFirst.toString(),
-                        style: TextStyle(fontSize: 14.sp)),
-                    SizedBox(
-                      width: 5.w,
+                    Container(
+                      //decoration: BoxDecoration(borderRadius: BorderRadius.circular(40),color:colorBlue),
+                      height: 35.h,
+                      width: MediaQuery.of(context).size.width,
+                      child: ElevatedButton(
+                        onPressed: () async {
+                          picked = await FilePicker.platform.pickFiles(
+                            type: FileType.custom,
+                            allowedExtensions: ['jpg', 'jpeg', 'png', "JPEG"],
+                          );
+                          if (picked == null) {
+                            Center(child: CircularProgressIndicator());
+                          } else {
+                            print(picked.files.first.name != null &&
+                                    picked.files.first.name != ""
+                                ? picked.files.first.name
+                                : "");
+                            controller.dynamicList[index]
+                                .visapathColoredPassport = picked;
+
+                            setState(() {
+                              controller
+                                      .dynamicList[index].imageColoredPassport =
+                                  picked.files.first.name;
+                              //  strNoFileChose = picked.files.first.name;
+                            });
+                          }
+                        },
+                        child: Icon(Icons.cloud_upload),
+                        style: ElevatedButton.styleFrom(
+                          primary: colorBlue,
+                          shape: new RoundedRectangleBorder(
+                            borderRadius: new BorderRadius.circular(30.0),
+                          ),
+                        ),
+                      ),
                     ),
-                    GestureDetector(
-                      onTap: (){
-                        showDialog<String>(
-                          context: context,
-                          builder: (BuildContext context) => AlertDialog(
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.all(
-                                Radius.circular(20),
-                              ),
-                            ),
-                            content: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              mainAxisAlignment: MainAxisAlignment.start,
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                Text("PASSPORT VALIDITY NOT LESS THAN 6 MONTHS",style: TextStyle(color: Colors.red,fontSize: 20.sp),textAlign: TextAlign.start,),
-                                SizedBox(height: 20.h,),
-                                Text("Step 1: Get a passport sized picture with a white background and take a picture of it.Make sure the picture is in focus *Do not take a selfie.",style: TextStyle(color: Colors.black,fontSize: 16.sp),textAlign: TextAlign.start,),
-                                SizedBox(height: 5.h,),
-                                Text("Step 2: Adjust and crop the picture to include the border around it.",style: TextStyle(color: Colors.black,fontSize: 16.sp),textAlign: TextAlign.start,),
-                                SizedBox(height: 5.h,),
-                                Text("Step 3: Final image should look like the image sample below",style: TextStyle(color: Colors.black,fontSize: 16.sp),textAlign: TextAlign.start,),
-                                SizedBox(height: 5.h,),
-                                Text("Size width 620px by height 800px",style: TextStyle(color: Colors.black,fontSize: 16.sp, fontWeight: FontWeight.bold),textAlign: TextAlign.start,),
-                                SizedBox(height: 5.h,),
-                                Align(alignment: Alignment.center,
-                                    child: Image.asset(passportPhoto)),
-                                SizedBox(height: 10.h,),
-                                GestureDetector(
-                                  onTap: (){
-                                    Navigator.pop(context);
-                                  },
-                                  child: Container(
-                                    padding:
-                                    EdgeInsets.only(left: 10.w, right: 10.w),
-                                    height: 40.h,
-                                    width:
-                                    MediaQuery.of(context).size.width / 1.5,
-                                    decoration: BoxDecoration(
-                                        borderRadius: BorderRadius.circular(12),
-                                        color: colorYellow),
-                                    child: Center(
-                                      child: Text(
-                                        "OK",
-                                        style: TextStyle(
-                                            fontSize: 14.sp,
-                                            color: colorWhite,
-                                            fontWeight: FontWeight.bold),
-                                      ),
+                    Padding(
+                      padding: EdgeInsets.all(8.r),
+                      child: Row(
+                        children: [
+                          Text(
+                              controller.dynamicList[index].imageColoredPassport
+                                  .toString(),
+                              style: TextStyle(fontSize: 14.sp)),
+                          SizedBox(
+                            width: 5.w,
+                          ),
+                          GestureDetector(
+                            onTap: () {
+                              showDialog<String>(
+                                context: context,
+                                builder: (BuildContext context) => AlertDialog(
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.all(
+                                      Radius.circular(20),
                                     ),
                                   ),
-                                )
-
-                              ],
+                                  content: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    mainAxisAlignment: MainAxisAlignment.start,
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      Text(
+                                        "PASSPORT VALIDITY NOT LESS THAN 6 MONTHS",
+                                        style: TextStyle(
+                                            color: Colors.red, fontSize: 20.sp),
+                                        textAlign: TextAlign.start,
+                                      ),
+                                      SizedBox(
+                                        height: 20.h,
+                                      ),
+                                      Text(
+                                        "Step 1: Take a clear picture of the passport(First Page), make sure it is in focus",
+                                        style: TextStyle(
+                                            color: Colors.black,
+                                            fontSize: 16.sp),
+                                        textAlign: TextAlign.start,
+                                      ),
+                                      SizedBox(
+                                        height: 5.h,
+                                      ),
+                                      Text(
+                                        "Step 2: Adjust and crop the picture to make sure to include the bottom two lines of the page.",
+                                        style: TextStyle(
+                                            color: Colors.black,
+                                            fontSize: 16.sp),
+                                        textAlign: TextAlign.start,
+                                      ),
+                                      SizedBox(
+                                        height: 5.h,
+                                      ),
+                                      Text(
+                                        "Step 3: Final image should look like the image sample below",
+                                        style: TextStyle(
+                                            color: Colors.black,
+                                            fontSize: 16.sp),
+                                        textAlign: TextAlign.start,
+                                      ),
+                                      SizedBox(
+                                        height: 5.h,
+                                      ),
+                                      Text(
+                                        "Size width 620px by height 800px",
+                                        style: TextStyle(
+                                            color: Colors.black,
+                                            fontSize: 16.sp,
+                                            fontWeight: FontWeight.bold),
+                                        textAlign: TextAlign.start,
+                                      ),
+                                      SizedBox(
+                                        height: 5.h,
+                                      ),
+                                      Text(
+                                        "*Passport Edges must be clear and visible*",
+                                        style: TextStyle(
+                                            color: Colors.black,
+                                            fontSize: 16.sp),
+                                        textAlign: TextAlign.start,
+                                      ),
+                                      SizedBox(
+                                        height: 5.h,
+                                      ),
+                                      Align(
+                                          alignment: Alignment.center,
+                                          child: Image.asset(passport)),
+                                      SizedBox(
+                                        height: 10.h,
+                                      ),
+                                      GestureDetector(
+                                        onTap: () {
+                                          Navigator.pop(context);
+                                        },
+                                        child: Container(
+                                          padding: EdgeInsets.only(
+                                              left: 10.w, right: 10.w),
+                                          height: 40.h,
+                                          width: MediaQuery.of(context)
+                                                  .size
+                                                  .width /
+                                              1.5,
+                                          decoration: BoxDecoration(
+                                              borderRadius:
+                                                  BorderRadius.circular(12),
+                                              color: colorYellow),
+                                          child: Center(
+                                            child: Text(
+                                              "OK",
+                                              style: TextStyle(
+                                                  fontSize: 14.sp,
+                                                  color: colorWhite,
+                                                  fontWeight: FontWeight.bold),
+                                            ),
+                                          ),
+                                        ),
+                                      )
+                                    ],
+                                  ),
+                                ),
+                              );
+                            },
+                            child: Image.asset(
+                              helpImage,
+                              height: 18.h,
+                              width: 18.h,
                             ),
-                          ),
-                        );
-                      },
-                      child: Image.asset(
-                        helpImage,
-                        height: 18.h,
-                        width: 18.h,
+                          )
+                        ],
                       ),
                     )
                   ],
                 ),
-              )
-            ],
-          ):SizedBox(),
-          controller.dynamicList[index].CountryName=="India"?Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Container(
-                //decoration: BoxDecoration(borderRadius: BorderRadius.circular(40),color:colorBlue),
-                height: 35.h,
-                width: MediaQuery.of(context).size.width,
-                child: ElevatedButton(
-                  onPressed: () async {
-                    picked = await FilePicker.platform.pickFiles(type: FileType.custom,
-                      allowedExtensions: ['jpg', 'jpeg', 'png','JPEG'],);
-                    if (picked == null) {
-                      Center(child: CircularProgressIndicator());
-                    } else {
-                      print(picked.files.first.name != null &&
-                          picked.files.first.name != ""
-                          ? picked.files.first.name
-                          : "");
-                      setState(() {
-                        controller.dynamicList[index].imageIndiaLast =
-                            picked.files.first.name;
-                        controller.dynamicList[index].visapathIndiaLast = picked;
-                      });
-                    }
-                  },
-                  child: Icon(Icons.cloud_upload),
-                  style: ElevatedButton.styleFrom(
-                    primary: colorBlue,
-                    shape: new RoundedRectangleBorder(
-                      borderRadius: new BorderRadius.circular(30.0),
-                    ),
-                  ),
-                ),
-              ),
-              Padding(
-                padding: EdgeInsets.all(8.r),
-                child: Row(
+          controller.dynamicList[index].CountryName == "India"
+              ? Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(controller.dynamicList[index].imageIndiaLast.toString(),
-                        style: TextStyle(fontSize: 14.sp)),
-                    SizedBox(
-                      width: 5.w,
+                    Container(
+                      //decoration: BoxDecoration(borderRadius: BorderRadius.circular(40),color:colorBlue),
+                      height: 35.h,
+                      width: MediaQuery.of(context).size.width,
+                      child: ElevatedButton(
+                        onPressed: () async {
+                          picked = await FilePicker.platform.pickFiles(
+                            type: FileType.custom,
+                            allowedExtensions: ['jpg', 'jpeg', 'png', 'JPEG'],
+                          );
+                          if (picked == null) {
+                            Center(child: CircularProgressIndicator());
+                          } else {
+                            print(picked.files.first.name != null &&
+                                    picked.files.first.name != ""
+                                ? picked.files.first.name
+                                : "");
+                            setState(() {
+                              controller.dynamicList[index].imageIndiaFirst =
+                                  picked.files.first.name;
+                              controller.dynamicList[index].visapathIndiaFirst =
+                                  picked;
+                            });
+                          }
+                        },
+                        child: Icon(Icons.cloud_upload),
+                        style: ElevatedButton.styleFrom(
+                          primary: colorBlue,
+                          shape: new RoundedRectangleBorder(
+                            borderRadius: new BorderRadius.circular(30.0),
+                          ),
+                        ),
+                      ),
                     ),
-                    GestureDetector(
-                      onTap: (){
-                        showDialog<String>(
-                          context: context,
-                          builder: (BuildContext context) => AlertDialog(
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.all(
-                                Radius.circular(20),
-                              ),
-                            ),
-                            content: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              mainAxisAlignment: MainAxisAlignment.start,
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                Text("PASSPORT VALIDITY NOT LESS THAN 6 MONTHS",style: TextStyle(color: Colors.red,fontSize: 20.sp),textAlign: TextAlign.start,),
-                                SizedBox(height: 20.h,),
-                                Text("Step 1: Get a passport sized picture with a white background and take a picture of it.Make sure the picture is in focus *Do not take a selfie.",style: TextStyle(color: Colors.black,fontSize: 16.sp),textAlign: TextAlign.start,),
-                                SizedBox(height: 5.h,),
-                                Text("Step 2: Adjust and crop the picture to include the border around it.",style: TextStyle(color: Colors.black,fontSize: 16.sp),textAlign: TextAlign.start,),
-                                SizedBox(height: 5.h,),
-                                Text("Step 3: Final image should look like the image sample below",style: TextStyle(color: Colors.black,fontSize: 16.sp),textAlign: TextAlign.start,),
-                                SizedBox(height: 5.h,),
-                                Text("Size width 620px by height 800px",style: TextStyle(color: Colors.black,fontSize: 16.sp, fontWeight: FontWeight.bold),textAlign: TextAlign.start,),
-                                SizedBox(height: 5.h,),
-                                Align(alignment: Alignment.center,
-                                    child: Image.asset(passportPhoto)),
-                                SizedBox(height: 10.h,),
-                                GestureDetector(
-                                  onTap: (){
-                                    Navigator.pop(context);
-                                  },
-                                  child: Container(
-                                    padding:
-                                    EdgeInsets.only(left: 10.w, right: 10.w),
-                                    height: 40.h,
-                                    width:
-                                    MediaQuery.of(context).size.width / 1.5,
-                                    decoration: BoxDecoration(
-                                        borderRadius: BorderRadius.circular(12),
-                                        color: colorYellow),
-                                    child: Center(
-                                      child: Text(
-                                        "OK",
-                                        style: TextStyle(
-                                            fontSize: 14.sp,
-                                            color: colorWhite,
-                                            fontWeight: FontWeight.bold),
-                                      ),
+                    Padding(
+                      padding: EdgeInsets.all(8.r),
+                      child: Row(
+                        children: [
+                          Text(
+                              controller.dynamicList[index].imageIndiaFirst
+                                  .toString(),
+                              style: TextStyle(fontSize: 14.sp)),
+                          SizedBox(
+                            width: 5.w,
+                          ),
+                          GestureDetector(
+                            onTap: () {
+                              showDialog<String>(
+                                context: context,
+                                builder: (BuildContext context) => AlertDialog(
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.all(
+                                      Radius.circular(20),
                                     ),
                                   ),
-                                )
-
-                              ],
+                                  content: Column(
+                                    crossAxisAlignment:
+                                    CrossAxisAlignment.start,
+                                    mainAxisAlignment: MainAxisAlignment.start,
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      Text(
+                                        "PASSPORT VALIDITY NOT LESS THAN 6 MONTHS",
+                                        style: TextStyle(
+                                            color: Colors.red, fontSize: 20.sp),
+                                        textAlign: TextAlign.start,
+                                      ),
+                                      SizedBox(
+                                        height: 20.h,
+                                      ),
+                                      Text(
+                                        "Step 1: Take a clear picture of the passport(First Page), make sure it is in focus",
+                                        style: TextStyle(
+                                            color: Colors.black,
+                                            fontSize: 16.sp),
+                                        textAlign: TextAlign.start,
+                                      ),
+                                      SizedBox(
+                                        height: 5.h,
+                                      ),
+                                      Text(
+                                        "Step 2: Adjust and crop the picture to make sure to include the bottom two lines of the page.",
+                                        style: TextStyle(
+                                            color: Colors.black,
+                                            fontSize: 16.sp),
+                                        textAlign: TextAlign.start,
+                                      ),
+                                      SizedBox(
+                                        height: 5.h,
+                                      ),
+                                      Text(
+                                        "Step 3: Final image should look like the image sample below",
+                                        style: TextStyle(
+                                            color: Colors.black,
+                                            fontSize: 16.sp),
+                                        textAlign: TextAlign.start,
+                                      ),
+                                      SizedBox(
+                                        height: 5.h,
+                                      ),
+                                      Text(
+                                        "Size width 620px by height 800px",
+                                        style: TextStyle(
+                                            color: Colors.black,
+                                            fontSize: 16.sp,
+                                            fontWeight: FontWeight.bold),
+                                        textAlign: TextAlign.start,
+                                      ),
+                                      SizedBox(
+                                        height: 5.h,
+                                      ),
+                                      Text(
+                                        "*Passport Edges must be clear and visible*",
+                                        style: TextStyle(
+                                            color: Colors.black,
+                                            fontSize: 16.sp),
+                                        textAlign: TextAlign.start,
+                                      ),
+                                      SizedBox(
+                                        height: 5.h,
+                                      ),
+                                      Align(
+                                          alignment: Alignment.center,
+                                          child: Image.asset(passport)),
+                                      SizedBox(
+                                        height: 10.h,
+                                      ),
+                                      GestureDetector(
+                                        onTap: () {
+                                          Navigator.pop(context);
+                                        },
+                                        child: Container(
+                                          padding: EdgeInsets.only(
+                                              left: 10.w, right: 10.w),
+                                          height: 40.h,
+                                          width: MediaQuery.of(context)
+                                              .size
+                                              .width /
+                                              1.5,
+                                          decoration: BoxDecoration(
+                                              borderRadius:
+                                              BorderRadius.circular(12),
+                                              color: colorYellow),
+                                          child: Center(
+                                            child: Text(
+                                              "OK",
+                                              style: TextStyle(
+                                                  fontSize: 14.sp,
+                                                  color: colorWhite,
+                                                  fontWeight: FontWeight.bold),
+                                            ),
+                                          ),
+                                        ),
+                                      )
+                                    ],
+                                  ),
+                                ),
+                              );
+                            },
+                            child: Image.asset(
+                              helpImage,
+                              height: 18.h,
+                              width: 18.h,
                             ),
-                          ),
-                        );
-                      },
-                      child: Image.asset(
-                        helpImage,
-                        height: 18.h,
-                        width: 18.h,
+                          )
+                        ],
                       ),
                     )
                   ],
-                ),
-              )
-            ],
-          ):SizedBox(),
-          controller.dynamicList[index].CountryName=="Pakistan"?Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Container(
-                //decoration: BoxDecoration(borderRadius: BorderRadius.circular(40),color:colorBlue),
-                height: 35.h,
-                width: MediaQuery.of(context).size.width,
-                child: ElevatedButton(
-                  onPressed: () async {
-                    picked = await FilePicker.platform.pickFiles(type: FileType.custom,
-                      allowedExtensions: ['jpg', 'jpeg', 'png','JPEG'],);
-                    if (picked == null) {
-                      Center(child: CircularProgressIndicator());
-                    } else {
-                      print(picked.files.first.name != null &&
-                          picked.files.first.name != ""
-                          ? picked.files.first.name
-                          : "");
-                      setState(() {
-                        controller.dynamicList[index].imagePakistanFront =
-                            picked.files.first.name;
-                        controller.dynamicList[index].visapathPakistanFront = picked;
-                      });
-                    }
-                  },
-                  child: Icon(Icons.cloud_upload),
-                  style: ElevatedButton.styleFrom(
-                    primary: colorBlue,
-                    shape: new RoundedRectangleBorder(
-                      borderRadius: new BorderRadius.circular(30.0),
-                    ),
-                  ),
-                ),
-              ),
-              Padding(
-                padding: EdgeInsets.all(8.r),
-                child: Row(
+                )
+              : SizedBox(),
+          controller.dynamicList[index].CountryName == "India"
+              ? Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(controller.dynamicList[index].imagePakistanFront.toString(),
-                        style: TextStyle(fontSize: 14.sp)),
-                    SizedBox(
-                      width: 5.w,
+                    Container(
+                      //decoration: BoxDecoration(borderRadius: BorderRadius.circular(40),color:colorBlue),
+                      height: 35.h,
+                      width: MediaQuery.of(context).size.width,
+                      child: ElevatedButton(
+                        onPressed: () async {
+                          picked = await FilePicker.platform.pickFiles(
+                            type: FileType.custom,
+                            allowedExtensions: ['jpg', 'jpeg', 'png', 'JPEG'],
+                          );
+                          if (picked == null) {
+                            Center(child: CircularProgressIndicator());
+                          } else {
+                            print(picked.files.first.name != null &&
+                                    picked.files.first.name != ""
+                                ? picked.files.first.name
+                                : "");
+                            setState(() {
+                              controller.dynamicList[index].imageIndiaLast =
+                                  picked.files.first.name;
+                              controller.dynamicList[index].visapathIndiaLast =
+                                  picked;
+                            });
+                          }
+                        },
+                        child: Icon(Icons.cloud_upload),
+                        style: ElevatedButton.styleFrom(
+                          primary: colorBlue,
+                          shape: new RoundedRectangleBorder(
+                            borderRadius: new BorderRadius.circular(30.0),
+                          ),
+                        ),
+                      ),
                     ),
-                    GestureDetector(
-                      onTap: (){
-                        showDialog<String>(
-                          context: context,
-                          builder: (BuildContext context) => AlertDialog(
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.all(
-                                Radius.circular(20),
-                              ),
-                            ),
-                            content: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              mainAxisAlignment: MainAxisAlignment.start,
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                Text("PASSPORT VALIDITY NOT LESS THAN 6 MONTHS",style: TextStyle(color: Colors.red,fontSize: 20.sp),textAlign: TextAlign.start,),
-                                SizedBox(height: 20.h,),
-                                Text("Step 1: Get a passport sized picture with a white background and take a picture of it.Make sure the picture is in focus *Do not take a selfie.",style: TextStyle(color: Colors.black,fontSize: 16.sp),textAlign: TextAlign.start,),
-                                SizedBox(height: 5.h,),
-                                Text("Step 2: Adjust and crop the picture to include the border around it.",style: TextStyle(color: Colors.black,fontSize: 16.sp),textAlign: TextAlign.start,),
-                                SizedBox(height: 5.h,),
-                                Text("Step 3: Final image should look like the image sample below",style: TextStyle(color: Colors.black,fontSize: 16.sp),textAlign: TextAlign.start,),
-                                SizedBox(height: 5.h,),
-                                Text("Size width 620px by height 800px",style: TextStyle(color: Colors.black,fontSize: 16.sp, fontWeight: FontWeight.bold),textAlign: TextAlign.start,),
-                                SizedBox(height: 5.h,),
-                                Align(alignment: Alignment.center,
-                                    child: Image.asset(passportPhoto)),
-                                SizedBox(height: 10.h,),
-                                GestureDetector(
-                                  onTap: (){
-                                    Navigator.pop(context);
-                                  },
-                                  child: Container(
-                                    padding:
-                                    EdgeInsets.only(left: 10.w, right: 10.w),
-                                    height: 40.h,
-                                    width:
-                                    MediaQuery.of(context).size.width / 1.5,
-                                    decoration: BoxDecoration(
-                                        borderRadius: BorderRadius.circular(12),
-                                        color: colorYellow),
-                                    child: Center(
-                                      child: Text(
-                                        "OK",
-                                        style: TextStyle(
-                                            fontSize: 14.sp,
-                                            color: colorWhite,
-                                            fontWeight: FontWeight.bold),
-                                      ),
+                    Padding(
+                      padding: EdgeInsets.all(8.r),
+                      child: Row(
+                        children: [
+                          Text(
+                              controller.dynamicList[index].imageIndiaLast
+                                  .toString(),
+                              style: TextStyle(fontSize: 14.sp)),
+                          SizedBox(
+                            width: 5.w,
+                          ),
+                          GestureDetector(
+                            onTap: () {
+                              showDialog<String>(
+                                context: context,
+                                builder: (BuildContext context) => AlertDialog(
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.all(
+                                      Radius.circular(20),
                                     ),
                                   ),
-                                )
-
-                              ],
+                                  content: Column(
+                                    crossAxisAlignment:
+                                    CrossAxisAlignment.start,
+                                    mainAxisAlignment: MainAxisAlignment.start,
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      Text(
+                                        "PASSPORT VALIDITY NOT LESS THAN 6 MONTHS",
+                                        style: TextStyle(
+                                            color: Colors.red, fontSize: 20.sp),
+                                        textAlign: TextAlign.start,
+                                      ),
+                                      SizedBox(
+                                        height: 20.h,
+                                      ),
+                                      Text(
+                                        "Step 1: Take a clear picture of the passport(Last Page), make sure it is in focus",
+                                        style: TextStyle(
+                                            color: Colors.black,
+                                            fontSize: 16.sp),
+                                        textAlign: TextAlign.start,
+                                      ),
+                                      SizedBox(
+                                        height: 5.h,
+                                      ),
+                                      Text(
+                                        "Step 2: Adjust and crop the picture to make sure to include the bottom two lines of the page.",
+                                        style: TextStyle(
+                                            color: Colors.black,
+                                            fontSize: 16.sp),
+                                        textAlign: TextAlign.start,
+                                      ),
+                                      SizedBox(
+                                        height: 5.h,
+                                      ),
+                                      Text(
+                                        "Step 3: Final image should look like the image sample below",
+                                        style: TextStyle(
+                                            color: Colors.black,
+                                            fontSize: 16.sp),
+                                        textAlign: TextAlign.start,
+                                      ),
+                                      SizedBox(
+                                        height: 5.h,
+                                      ),
+                                      Text(
+                                        "Size width 620px by height 800px",
+                                        style: TextStyle(
+                                            color: Colors.black,
+                                            fontSize: 16.sp,
+                                            fontWeight: FontWeight.bold),
+                                        textAlign: TextAlign.start,
+                                      ),
+                                      SizedBox(
+                                        height: 5.h,
+                                      ),
+                                      Text(
+                                        "*Passport Edges must be clear and visible*",
+                                        style: TextStyle(
+                                            color: Colors.black,
+                                            fontSize: 16.sp),
+                                        textAlign: TextAlign.start,
+                                      ),
+                                      SizedBox(
+                                        height: 5.h,
+                                      ),
+                                      Align(
+                                          alignment: Alignment.center,
+                                          child: Image.asset(passport)),
+                                      SizedBox(
+                                        height: 10.h,
+                                      ),
+                                      GestureDetector(
+                                        onTap: () {
+                                          Navigator.pop(context);
+                                        },
+                                        child: Container(
+                                          padding: EdgeInsets.only(
+                                              left: 10.w, right: 10.w),
+                                          height: 40.h,
+                                          width: MediaQuery.of(context)
+                                              .size
+                                              .width /
+                                              1.5,
+                                          decoration: BoxDecoration(
+                                              borderRadius:
+                                              BorderRadius.circular(12),
+                                              color: colorYellow),
+                                          child: Center(
+                                            child: Text(
+                                              "OK",
+                                              style: TextStyle(
+                                                  fontSize: 14.sp,
+                                                  color: colorWhite,
+                                                  fontWeight: FontWeight.bold),
+                                            ),
+                                          ),
+                                        ),
+                                      )
+                                    ],
+                                  ),
+                                ),
+                              );
+                            },
+                            child: Image.asset(
+                              helpImage,
+                              height: 18.h,
+                              width: 18.h,
                             ),
-                          ),
-                        );
-                      },
-                      child: Image.asset(
-                        helpImage,
-                        height: 18.h,
-                        width: 18.h,
+                          )
+                        ],
                       ),
                     )
                   ],
-                ),
-              )
-            ],
-          ):SizedBox(),
-          controller.dynamicList[index].CountryName=="Pakistan"?Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Container(
-                //decoration: BoxDecoration(borderRadius: BorderRadius.circular(40),color:colorBlue),
-                height: 35.h,
-                width: MediaQuery.of(context).size.width,
-                child: ElevatedButton(
-                  onPressed: () async {
-                    picked = await FilePicker.platform.pickFiles(type: FileType.custom,
-                      allowedExtensions: ['jpg', 'jpeg', 'png','JPEG'],);
-                    if (picked == null) {
-                      Center(child: CircularProgressIndicator());
-                    } else {
-                      print(picked.files.first.name != null &&
-                          picked.files.first.name != ""
-                          ? picked.files.first.name
-                          : "");
-                      setState(() {
-                        controller.dynamicList[index].imagePakistanBack =
-                            picked.files.first.name;
-                        controller.dynamicList[index].visapathPakistanBack = picked;
-                      });
-                    }
-                  },
-                  child: Icon(Icons.cloud_upload),
-                  style: ElevatedButton.styleFrom(
-                    primary: colorBlue,
-                    shape: new RoundedRectangleBorder(
-                      borderRadius: new BorderRadius.circular(30.0),
-                    ),
-                  ),
-                ),
-              ),
-              Padding(
-                padding: EdgeInsets.all(8.r),
-                child: Row(
+                )
+              : SizedBox(),
+          controller.dynamicList[index].CountryName == "Pakistan"
+              ? Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(controller.dynamicList[index].imagePakistanBack.toString(),
-                        style: TextStyle(fontSize: 14.sp)),
-                    SizedBox(
-                      width: 5.w,
+                    Container(
+                      //decoration: BoxDecoration(borderRadius: BorderRadius.circular(40),color:colorBlue),
+                      height: 35.h,
+                      width: MediaQuery.of(context).size.width,
+                      child: ElevatedButton(
+                        onPressed: () async {
+                          picked = await FilePicker.platform.pickFiles(
+                            type: FileType.custom,
+                            allowedExtensions: ['jpg', 'jpeg', 'png', 'JPEG'],
+                          );
+                          if (picked == null) {
+                            Center(child: CircularProgressIndicator());
+                          } else {
+                            print(picked.files.first.name != null &&
+                                    picked.files.first.name != ""
+                                ? picked.files.first.name
+                                : "");
+                            setState(() {
+                              controller.dynamicList[index].imagePakistanFront =
+                                  picked.files.first.name;
+                              controller.dynamicList[index]
+                                  .visapathPakistanFront = picked;
+                            });
+                          }
+                        },
+                        child: Icon(Icons.cloud_upload),
+                        style: ElevatedButton.styleFrom(
+                          primary: colorBlue,
+                          shape: new RoundedRectangleBorder(
+                            borderRadius: new BorderRadius.circular(30.0),
+                          ),
+                        ),
+                      ),
                     ),
-                    GestureDetector(
-                      onTap: (){
-                        showDialog<String>(
-                          context: context,
-                          builder: (BuildContext context) => AlertDialog(
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.all(
-                                Radius.circular(20),
-                              ),
-                            ),
-                            content: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              mainAxisAlignment: MainAxisAlignment.start,
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                Text("PASSPORT VALIDITY NOT LESS THAN 6 MONTHS",style: TextStyle(color: Colors.red,fontSize: 20.sp),textAlign: TextAlign.start,),
-                                SizedBox(height: 20.h,),
-                                Text("Step 1: Get a passport sized picture with a white background and take a picture of it.Make sure the picture is in focus *Do not take a selfie.",style: TextStyle(color: Colors.black,fontSize: 16.sp),textAlign: TextAlign.start,),
-                                SizedBox(height: 5.h,),
-                                Text("Step 2: Adjust and crop the picture to include the border around it.",style: TextStyle(color: Colors.black,fontSize: 16.sp),textAlign: TextAlign.start,),
-                                SizedBox(height: 5.h,),
-                                Text("Step 3: Final image should look like the image sample below",style: TextStyle(color: Colors.black,fontSize: 16.sp),textAlign: TextAlign.start,),
-                                SizedBox(height: 5.h,),
-                                Text("Size width 620px by height 800px",style: TextStyle(color: Colors.black,fontSize: 16.sp, fontWeight: FontWeight.bold),textAlign: TextAlign.start,),
-                                SizedBox(height: 5.h,),
-                                Align(alignment: Alignment.center,
-                                    child: Image.asset(passportPhoto)),
-                                SizedBox(height: 10.h,),
-                                GestureDetector(
-                                  onTap: (){
-                                    Navigator.pop(context);
-                                  },
-                                  child: Container(
-                                    padding:
-                                    EdgeInsets.only(left: 10.w, right: 10.w),
-                                    height: 40.h,
-                                    width:
-                                    MediaQuery.of(context).size.width / 1.5,
-                                    decoration: BoxDecoration(
-                                        borderRadius: BorderRadius.circular(12),
-                                        color: colorYellow),
-                                    child: Center(
-                                      child: Text(
-                                        "OK",
-                                        style: TextStyle(
-                                            fontSize: 14.sp,
-                                            color: colorWhite,
-                                            fontWeight: FontWeight.bold),
-                                      ),
+                    Padding(
+                      padding: EdgeInsets.all(8.r),
+                      child: Row(
+                        children: [
+                          Text(
+                              controller.dynamicList[index].imagePakistanFront
+                                  .toString(),
+                              style: TextStyle(fontSize: 14.sp)),
+                          SizedBox(
+                            width: 5.w,
+                          ),
+                          GestureDetector(
+                            onTap: () {
+                              showDialog<String>(
+                                context: context,
+                                builder: (BuildContext context) => AlertDialog(
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.all(
+                                      Radius.circular(20),
                                     ),
                                   ),
-                                )
+                                  content: Column(
+                                    crossAxisAlignment:
+                                    CrossAxisAlignment.start,
+                                    mainAxisAlignment: MainAxisAlignment.start,
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      Text(
+                                        "PASSPORT VALIDITY NOT LESS THAN 6 MONTHS",
+                                        style: TextStyle(
+                                            color: Colors.red, fontSize: 20.sp),
+                                        textAlign: TextAlign.start,
+                                      ),
+                                      SizedBox(
+                                        height: 20.h,
+                                      ),
+                                      Text(
+                                        "Step 1: Take a clear picture of the Front page ID, make sure it is in focus",
+                                        style: TextStyle(
+                                            color: Colors.black,
+                                            fontSize: 16.sp),
+                                        textAlign: TextAlign.start,
+                                      ),
+                                      SizedBox(
+                                        height: 5.h,
+                                      ),
+                                      Text(
+                                        "Step 2: Adjust and crop the picture to make sure to include the bottom two lines of the National ID.",
+                                        style: TextStyle(
+                                            color: Colors.black,
+                                            fontSize: 16.sp),
+                                        textAlign: TextAlign.start,
+                                      ),
+                                      SizedBox(
+                                        height: 5.h,
+                                      ),
+                                      Text(
+                                        "Step 3: Final image should look like the image sample below",
+                                        style: TextStyle(
+                                            color: Colors.black,
+                                            fontSize: 16.sp),
+                                        textAlign: TextAlign.start,
+                                      ),
+                                      SizedBox(
+                                        height: 5.h,
+                                      ),
+                                      Text(
+                                        "*ID edges Must be clear and visible*",
+                                        style: TextStyle(
+                                            color: Colors.black,
+                                            fontSize: 16.sp),
+                                        textAlign: TextAlign.start,
+                                      ),
+                                      SizedBox(
+                                        height: 5.h,
+                                      ),
+                                      Text(
+                                        "Size width 620px by height 800px",
+                                        style: TextStyle(
+                                            color: Colors.black,
+                                            fontSize: 16.sp,
+                                            fontWeight: FontWeight.bold),
+                                        textAlign: TextAlign.start,
+                                      ),
 
-                              ],
+                                      SizedBox(
+                                        height: 5.h,
+                                      ),
+                                      Align(
+                                          alignment: Alignment.center,
+                                          child: Image.asset(pakistanFrontId)),
+                                      SizedBox(
+                                        height: 10.h,
+                                      ),
+                                      GestureDetector(
+                                        onTap: () {
+                                          Navigator.pop(context);
+                                        },
+                                        child: Container(
+                                          padding: EdgeInsets.only(
+                                              left: 10.w, right: 10.w),
+                                          height: 40.h,
+                                          width: MediaQuery.of(context)
+                                              .size
+                                              .width /
+                                              1.5,
+                                          decoration: BoxDecoration(
+                                              borderRadius:
+                                              BorderRadius.circular(12),
+                                              color: colorYellow),
+                                          child: Center(
+                                            child: Text(
+                                              "OK",
+                                              style: TextStyle(
+                                                  fontSize: 14.sp,
+                                                  color: colorWhite,
+                                                  fontWeight: FontWeight.bold),
+                                            ),
+                                          ),
+                                        ),
+                                      )
+                                    ],
+                                  ),
+                                ),
+                              );
+                            },
+                            child: Image.asset(
+                              helpImage,
+                              height: 18.h,
+                              width: 18.h,
                             ),
-                          ),
-                        );
-                      },
-                      child: Image.asset(
-                        helpImage,
-                        height: 18.h,
-                        width: 18.h,
+                          )
+                        ],
                       ),
                     )
                   ],
-                ),
-              )
-            ],
-          ):SizedBox(),
+                )
+              : SizedBox(),
+          controller.dynamicList[index].CountryName == "Pakistan"
+              ? Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Container(
+                      //decoration: BoxDecoration(borderRadius: BorderRadius.circular(40),color:colorBlue),
+                      height: 35.h,
+                      width: MediaQuery.of(context).size.width,
+                      child: ElevatedButton(
+                        onPressed: () async {
+                          picked = await FilePicker.platform.pickFiles(
+                            type: FileType.custom,
+                            allowedExtensions: ['jpg', 'jpeg', 'png', 'JPEG'],
+                          );
+                          if (picked == null) {
+                            Center(child: CircularProgressIndicator());
+                          } else {
+                            print(picked.files.first.name != null &&
+                                    picked.files.first.name != ""
+                                ? picked.files.first.name
+                                : "");
+                            setState(() {
+                              controller.dynamicList[index].imagePakistanBack =
+                                  picked.files.first.name;
+                              controller.dynamicList[index]
+                                  .visapathPakistanBack = picked;
+                            });
+                          }
+                        },
+                        child: Icon(Icons.cloud_upload),
+                        style: ElevatedButton.styleFrom(
+                          primary: colorBlue,
+                          shape: new RoundedRectangleBorder(
+                            borderRadius: new BorderRadius.circular(30.0),
+                          ),
+                        ),
+                      ),
+                    ),
+                    Padding(
+                      padding: EdgeInsets.all(8.r),
+                      child: Row(
+                        children: [
+                          Text(
+                              controller.dynamicList[index].imagePakistanBack
+                                  .toString(),
+                              style: TextStyle(fontSize: 14.sp)),
+                          SizedBox(
+                            width: 5.w,
+                          ),
+                          GestureDetector(
+                            onTap: () {
+                              showDialog<String>(
+                                context: context,
+                                builder: (BuildContext context) => AlertDialog(
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.all(
+                                      Radius.circular(20),
+                                    ),
+                                  ),
+                                  content:  Column(
+                                    crossAxisAlignment:
+                                    CrossAxisAlignment.start,
+                                    mainAxisAlignment: MainAxisAlignment.start,
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      Text(
+                                        "PASSPORT VALIDITY NOT LESS THAN 6 MONTHS",
+                                        style: TextStyle(
+                                            color: Colors.red, fontSize: 20.sp),
+                                        textAlign: TextAlign.start,
+                                      ),
+                                      SizedBox(
+                                        height: 20.h,
+                                      ),
+                                      Text(
+                                        "Step 1: Take a clear picture of the Back page ID, make sure it is in focus",
+                                        style: TextStyle(
+                                            color: Colors.black,
+                                            fontSize: 16.sp),
+                                        textAlign: TextAlign.start,
+                                      ),
+                                      SizedBox(
+                                        height: 5.h,
+                                      ),
+                                      Text(
+                                        "Step 2: Adjust and crop the picture to make sure to include the bottom two lines of the National ID.",
+                                        style: TextStyle(
+                                            color: Colors.black,
+                                            fontSize: 16.sp),
+                                        textAlign: TextAlign.start,
+                                      ),
+                                      SizedBox(
+                                        height: 5.h,
+                                      ),
+                                      Text(
+                                        "Step 3: Final image should look like the image sample below",
+                                        style: TextStyle(
+                                            color: Colors.black,
+                                            fontSize: 16.sp),
+                                        textAlign: TextAlign.start,
+                                      ),
+                                      SizedBox(
+                                        height: 5.h,
+                                      ),
+                                      Text(
+                                        "*ID edges Must be clear and visible*",
+                                        style: TextStyle(
+                                            color: Colors.black,
+                                            fontSize: 16.sp),
+                                        textAlign: TextAlign.start,
+                                      ),
+                                      SizedBox(
+                                        height: 5.h,
+                                      ),
+                                      Text(
+                                        "Size width 620px by height 800px",
+                                        style: TextStyle(
+                                            color: Colors.black,
+                                            fontSize: 16.sp,
+                                            fontWeight: FontWeight.bold),
+                                        textAlign: TextAlign.start,
+                                      ),
+
+                                      SizedBox(
+                                        height: 5.h,
+                                      ),
+                                      Align(
+                                          alignment: Alignment.center,
+                                          child: Image.asset(pakistanBackId)),
+                                      SizedBox(
+                                        height: 10.h,
+                                      ),
+                                      GestureDetector(
+                                        onTap: () {
+                                          Navigator.pop(context);
+                                        },
+                                        child: Container(
+                                          padding: EdgeInsets.only(
+                                              left: 10.w, right: 10.w),
+                                          height: 40.h,
+                                          width: MediaQuery.of(context)
+                                              .size
+                                              .width /
+                                              1.5,
+                                          decoration: BoxDecoration(
+                                              borderRadius:
+                                              BorderRadius.circular(12),
+                                              color: colorYellow),
+                                          child: Center(
+                                            child: Text(
+                                              "OK",
+                                              style: TextStyle(
+                                                  fontSize: 14.sp,
+                                                  color: colorWhite,
+                                                  fontWeight: FontWeight.bold),
+                                            ),
+                                          ),
+                                        ),
+                                      )
+                                    ],
+                                  ),
+                                ),
+                              );
+                            },
+                            child: Image.asset(
+                              helpImage,
+                              height: 18.h,
+                              width: 18.h,
+                            ),
+                          )
+                        ],
+                      ),
+                    )
+                  ],
+                )
+              : SizedBox(),
         ],
       ),
     );
@@ -1345,7 +1744,8 @@ class VisaValue {
   String? lastName;
   String? CountryId;
   String? CountryName;
-  String? travelDate;
+  String? countryPrice;
+  String? travelDate="Date of Travel";
   String? imageColoredPassport = "Colored Passport";
   String? imagePassportSizePhoto = "Passport size Photo";
   String? imageIndiaFirst = "Colored Passport(First Page)";
@@ -1359,12 +1759,14 @@ class VisaValue {
   FilePickerResult? visapathPakistanFront;
   FilePickerResult? visapathPakistanBack;
 
+
   VisaValue(
       {this.title,
       this.firstName,
       this.lastName,
       this.CountryId,
       this.CountryName,
+      this.countryPrice,
       this.travelDate,
       this.imageColoredPassport,
       this.imagePassportSizePhoto,
@@ -1377,5 +1779,6 @@ class VisaValue {
       this.visapathIndiaFirst,
       this.visapathIndiaLast,
       this.visapathPakistanFront,
-      this.visapathPakistanBack});
+      this.visapathPakistanBack,
+     });
 }

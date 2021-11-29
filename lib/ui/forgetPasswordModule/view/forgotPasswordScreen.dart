@@ -6,6 +6,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:visa_app/constants/appColor.dart';
 import 'package:visa_app/constants/appImages.dart';
+import 'package:visa_app/constants/constants.dart';
 import 'package:visa_app/constants/stringConstants.dart';
 import 'package:visa_app/ui/forgetPasswordModule/controller/forgotPasswordController.dart';
 import 'package:visa_app/ui/signInModule/view/signInScreen.dart';
@@ -134,7 +135,17 @@ class _ForgotPasswordState extends State<ForgotPassword> {
                             ),
                           ),
                           onTap: controller.isValidValidation.value
-                              ? () => controller.forgotPasswordApi()
+                              ? () async {
+                            {
+                              bool isOnline = await hasNetwork();
+                              if(isOnline)  {
+                                controller.forgotPasswordApi();
+                              }
+                              else{
+                                Get.snackbar("oops..","Internet not avaliable");
+                              }
+                            }
+                          }
                               : null,
                         ),
                       ),

@@ -17,7 +17,7 @@ class ApplyVisaFirstStepController extends GetxController {
   applyVisaFirstStepApi() {
      loader.value = true;
     Map<String, dynamic> map = Map<String, dynamic>();
-   // map["country_check"] = selectedCountryId;
+    map["country_check"] = selectedCountryId;
 
 
 
@@ -32,7 +32,7 @@ class ApplyVisaFirstStepController extends GetxController {
 
   Resource<ApplyVisaFirstStepModel> get selectVisaPlanType {
     return Resource(
-        url: ApiEndpoint.selectVisatype+"?id="+selectedCountryId,
+        url: ApiEndpoint.selectVisatype,
         parse: (response) {
           var result;
           //     Get.back();

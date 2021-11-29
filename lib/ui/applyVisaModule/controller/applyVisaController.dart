@@ -1,22 +1,25 @@
 import 'dart:async';
 import 'dart:convert';
 
-import 'package:get/get.dart';
+
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:http/http.dart' as http;
 import 'package:http_parser/http_parser.dart';
 import 'package:visa_app/service/ApiEndPoint.dart';
 import 'package:visa_app/ui/HomeModule/model/countryModel.dart';
 import 'package:visa_app/ui/applyVisaModule/model/CommonResponse.dart';
+import 'package:visa_app/ui/applyVisaModule/model/CountryPriceModel.dart';
 import 'package:visa_app/ui/applyVisaModule/view/applyVisaScreen.dart';
 import 'package:visa_app/ui/trackApplicationModule/view/trackApplicationScreen.dart';
 import 'package:visa_app/webservice.dart';
-import 'package:http/http.dart' as http;
-import 'package:http/http.dart';
 
 class ApplyVisaController extends GetxController {
-  var isSelected=false.obs;
+  var isSelected = false.obs;
+
   var countryDropDownName = "".obs;
-  List<VisaValue> dynamicList=[];
+  List<VisaValue> dynamicList = [];
+  //var countryPrice = "".obs;
 
   var firstNameController = TextEditingController();
   var firstNameError = true.obs;
@@ -30,19 +33,20 @@ class ApplyVisaController extends GetxController {
   var dateError = true.obs;
   var dateValidationMessage = "".obs;
 
-  var childWidgetLength=0.obs;
+  var childWidgetLength = 0.obs;
 
   var isChecked = false.obs;
-  var count=0;
-  String applicationNumber="";
-  String userIds ="";
-  var prefix ;
+  var count = 0;
+  String applicationNumber = "";
+  String userIds = "";
+  var prefix;
+  var updateValue=false.obs;
 
   // For country api
   late CountryResponse country;
-  var loader=true.obs;
-  var countryList=[].obs;
-  bool isComplete=false;
+  var loader = false.obs;
+  var countryList = [].obs;
+  bool isComplete = false;
 
   checkName(String name) {
     if (name == "") {
@@ -54,15 +58,29 @@ class ApplyVisaController extends GetxController {
   }
 
   cleanController() {
-    childWidgetLength.value=0;
+    childWidgetLength.value = 0;
   }
 
+  doApplyVisa(
+      String appDay,
+      int appPerson,
+      int userId,
+      String title,
+      String firstName,
+      String lastName,
+      String countryName,
+      int countryId,
+      String appDate,
+      String passortSizePhoto,
+      String colouredPassort,
+      String colouredPassort_First_Page,
+      String colouredPassort_Last_Page,
+      String pakistanNational_ID_Front,
+      String pakistan_National_ID_Back) async {
 
-  doApplyVisa(String appDay,int appPerson,int userId,
-      String title,String firstName,String lastName,String countryName,int countryId,
-      String appDate,String passortSizePhoto,String colouredPassort,String colouredPassort_First_Page,
-      String colouredPassort_Last_Page,String pakistanNational_ID_Front,String pakistan_National_ID_Back ) async{
-    var request = new http.MultipartRequest("POST", Uri.parse(ApiEndpoint.applyForVisa));
+    loader.value=true;
+    var request =
+        new http.MultipartRequest("POST", Uri.parse(ApiEndpoint.applyForVisa));
     request.fields['applicationDays'] = appDay.toString();
     request.fields['applicationPerson'] = appPerson.toString();
     request.fields["userId"] = userId.toString();
@@ -80,36 +98,36 @@ class ApplyVisaController extends GetxController {
     request.fields["pakistanNational_ID_Front"] = pakistanNational_ID_Front;
     request.fields["pakistan_National_ID_Back"] = pakistan_National_ID_Back;
 
-    if(colouredPassort != "") {
-      request.files.add(
-          await http.MultipartFile.fromPath('colouredPassort', colouredPassort,
-              contentType: MediaType('image', '')));
+    if (colouredPassort != "") {
+      request.files.add(await http.MultipartFile.fromPath(
+          'colouredPassort', colouredPassort,
+          contentType: MediaType('image', '')));
     }
 
-    if(passortSizePhoto != "") {
+    if (passortSizePhoto != "") {
       request.files.add(await http.MultipartFile.fromPath(
           'passortSizePhoto', passortSizePhoto,
           contentType: new MediaType('image', '')));
     }
 
-    if(colouredPassort_First_Page != "") {
+    if (colouredPassort_First_Page != "") {
       request.files.add(await http.MultipartFile.fromPath(
           'colouredPassort_First_Page', colouredPassort_First_Page,
           contentType: MediaType('image', '')));
     }
-    if(colouredPassort_Last_Page != "") {
+    if (colouredPassort_Last_Page != "") {
       request.files.add(await http.MultipartFile.fromPath(
           'colouredPassort_Last_Page', colouredPassort_Last_Page,
           contentType: new MediaType('image', '')));
     }
 
-    if(pakistanNational_ID_Front != "") {
+    if (pakistanNational_ID_Front != "") {
       request.files.add(await http.MultipartFile.fromPath(
           'pakistanNational_ID_Front', pakistanNational_ID_Front,
           contentType: new MediaType('image', '')));
     }
 
-    if(pakistan_National_ID_Back != "") {
+    if (pakistan_National_ID_Back != "") {
       request.files.add(await http.MultipartFile.fromPath(
           'pakistan_National_ID_Back', pakistan_National_ID_Back,
           contentType: new MediaType('image', '')));
@@ -119,98 +137,128 @@ class ApplyVisaController extends GetxController {
     // print(response.stream);
     // print(response.statusCode);
 
-
-    request.send().then((response)  async {
+    request.send().then((response) async {
       if (response.statusCode == 200) {
         var res = await http.Response.fromStream(response);
         CommonResponce commonModel = commonResponceFromJson(res.body);
+        print("" + ".......getSupplierLogin......." + commonModel.toString());
         print("Response of image api:" + commonModel.applicationId.toString());
         print("Uploaded!");
-        applicationNumber=commonModel.applicationId.toString();
-              print("application number:"+applicationNumber);
-              if(dynamicList.length>1){
-                for(int i = 0; i < dynamicList.length - 1; i++)
-                  {
-                    {
-                      doApplyVisa(
-                        prefix,
-                        dynamicList.length,
-                        int.parse(userIds),
-                      dynamicList[i+1].title.toString(),
-                        dynamicList[i+1].firstName
-                            .toString(),
-                       dynamicList[i+1].lastName.toString(),
-                       dynamicList[i+1].CountryName
-                            .toString(),
-                        int.parse(dynamicList[i+1].CountryId
-                            .toString()),
-                        dateController.text.toString(),
+        applicationNumber = commonModel.applicationId.toString();
+        print("application number:" + applicationNumber);
+        print("isComplete:" + isComplete.toString());
+        if(isComplete){
+          dynamicList.clear();
+          loader.value=false;
+          applicationNumber = "";
+          Get.to(TrackApplicationPage(
+            applicationNumber: commonModel.applicatioNumber,
+          ));
 
-                        dynamicList[i+1].visapathPassportSizePhoto!.paths
-                            .first
-                            .toString(),
+        }
+        if (dynamicList.length > 1) {
+          for (int i = 0; i < dynamicList.length - 1; i++) {
 
-                       dynamicList[i+1].CountryName=="India"?""
-                            :dynamicList[i+1].visapathColoredPassport!.paths
-                            .first
-                            .toString(),
+              doApplyVisa(
+                prefix,
+                dynamicList.length,
+                int.parse(userIds),
+                dynamicList[i + 1].title.toString(),
+                dynamicList[i + 1].firstName.toString(),
+                dynamicList[i + 1].lastName.toString(),
+                dynamicList[i + 1].CountryName.toString(),
+                int.parse(dynamicList[i + 1].CountryId.toString()),
+                dynamicList[i+1].travelDate.toString(),
+                dynamicList[i + 1]
+                    .visapathPassportSizePhoto!
+                    .paths
+                    .first
+                    .toString(),
+                dynamicList[i + 1].CountryName == "India"
+                    ? ""
+                    : dynamicList[i + 1]
+                        .visapathColoredPassport!
+                        .paths
+                        .first
+                        .toString(),
+                dynamicList[i + 1].CountryName == "India"
+                    ? dynamicList[i + 1]
+                        .visapathIndiaFirst!
+                        .paths
+                        .first
+                        .toString()
+                    : "",
+                dynamicList[i + 1].CountryName == "India"
+                    ? dynamicList[i + 1]
+                        .visapathIndiaLast!
+                        .paths
+                        .first
+                        .toString()
+                    : "",
+                dynamicList[i + 1].CountryName == "Pakistan"
+                    ? dynamicList[i + 1]
+                        .visapathPakistanFront!
+                        .paths
+                        .first
+                        .toString()
+                    : "",
+                dynamicList[i + 1].CountryName == "Pakistan"
+                    ? dynamicList[i + 1]
+                        .visapathPakistanBack!
+                        .paths
+                        .first
+                        .toString()
+                    : "",
+              );
+                      if(i+1==dynamicList.length-1){
+                        isComplete=true;
+                        print("match");
 
+                      }else{
+                        isComplete=false;
+                        print("not match");
+                      }
+          }
 
-                       dynamicList[i+1].CountryName=="India"?
-                        dynamicList[i+1].visapathIndiaFirst!.paths.first
-                            .toString():"",
+          // dynamicList.clear();
+          // Timer(Duration(milliseconds: 20000), () {
+          //   loader.value=false;
+          //   applicationNumber = "";
+          //   Get.to(TrackApplicationPage(
+          //     applicationNumber: commonModel.applicatioNumber,
+          //   ));
+          // });
+        } else {
+          loader.value=false;
+          applicationNumber = "";
 
-
-                        dynamicList[i+1].CountryName=="India"?
-                        dynamicList[i+1].visapathIndiaLast!.paths.first
-                            .toString():"",
-
-
-                        dynamicList[i+1].CountryName=="Pakistan"?
-                        dynamicList[i+1].visapathPakistanFront!.paths
-                            .first
-                            .toString():"",
-
-
-                        dynamicList[i+1].CountryName=="Pakistan"?
-                        dynamicList[i+1].visapathPakistanBack!.paths
-                            .first
-                            .toString():"",);
-                    }
-
-                  };
-                dynamicList.clear();
-                Timer(Duration(milliseconds: 10000), () {
-                  applicationNumber="";
-                  Get.to(TrackApplicationPage(applicationNumber: commonModel.applicatioNumber,));
-                });
-
-              }
-              else{
-                applicationNumber="";
-                Get.to(TrackApplicationPage(applicationNumber: commonModel.applicatioNumber,));
-              }
-      }
-      else{
+          print("application number:" + commonModel.applicatioNumber.toString());
+          Get.to(TrackApplicationPage(
+            applicationNumber: commonModel.applicatioNumber,
+          ));
+        }
+        print("execute statement");
+      } else {
         print("error!");
       }
     });
-    print("appDay:"+appDay.toString());
-    print("appPerson:"+appPerson.toString());
-    print("userId:"+userId.toString());
-    print("applicationNumber:"+applicationNumber.toString());
-    print("title:"+title.toString());
-    print("firstName:"+firstName.toString());
-    print("lastName:"+lastName.toString());
-    print("countryName:"+countryName.toString());
-    print("countryId:"+countryId.toString());
-    print("appDate:"+appDate.toString());
-    print("colouredPassort:"+colouredPassort.toString());
-    print("passortSizePhoto:"+passortSizePhoto.toString());
-    print("colouredPassort_First_Page:"+colouredPassort_First_Page.toString());
-    print("colouredPassort_Last_Page:"+colouredPassort_Last_Page.toString());
-    print("pakistanNational_ID_Front:"+pakistanNational_ID_Front.toString());
-    print("pakistan_National_ID_Back:"+pakistan_National_ID_Back.toString());
+    print("appDay:" + appDay.toString());
+    print("appPerson:" + appPerson.toString());
+    print("userId:" + userId.toString());
+    print("applicationNumber:" + applicationNumber.toString());
+    print("title:" + title.toString());
+    print("firstName:" + firstName.toString());
+    print("lastName:" + lastName.toString());
+    print("countryName:" + countryName.toString());
+    print("countryId:" + countryId.toString());
+    print("appDate:" + appDate.toString());
+    print("colouredPassort:" + colouredPassort.toString());
+    print("passortSizePhoto:" + passortSizePhoto.toString());
+    print(
+        "colouredPassort_First_Page:" + colouredPassort_First_Page.toString());
+    print("colouredPassort_Last_Page:" + colouredPassort_Last_Page.toString());
+    print("pakistanNational_ID_Front:" + pakistanNational_ID_Front.toString());
+    print("pakistan_National_ID_Back:" + pakistan_National_ID_Back.toString());
 
     // Map<String, dynamic> map = Map<String, dynamic>();
     // map["applicationDays"] = appDay.toString();
@@ -357,12 +405,9 @@ class ApplyVisaController extends GetxController {
           var result;
           //     Get.back();
           //      final result = json.decode(response.body);
-          if(response.body.isNotEmpty) {
-            result= json.decode(response.body);
-
-          }
-          else
-          {
+          if (response.body.isNotEmpty) {
+            result = json.decode(response.body);
+          } else {
             print("empty responce");
           }
           print("" + ".......getSupplierLogin......." + result.toString());
@@ -372,7 +417,6 @@ class ApplyVisaController extends GetxController {
           if (success) {
             return commonResponceFromJson(response.body);
           } else {
-
             String message = result["message"];
             Get.snackbar("dfasdf", message);
             return commonResponceFromJson(response.body);
@@ -396,15 +440,15 @@ class ApplyVisaController extends GetxController {
   // }
 
   getCountryListApi() {
+    loader.value=true;
     Map<String, dynamic> map = Map<String, dynamic>();
 
     Webservice().loadPost(getCountryList, map).then(
           (model) => {
-        print("name is::" + model.message.toString()),
-        if (model.status == true) {
-        } else {}
-      },
-    );
+            print("name is::" + model.message.toString()),
+            if (model.status == true) {} else {}
+          },
+        );
   }
 
   Resource<CountryResponse> get getCountryList {
@@ -412,6 +456,53 @@ class ApplyVisaController extends GetxController {
         url: ApiEndpoint.countryList,
         parse: (response) {
           var result;
+          if (response.body.isNotEmpty) {
+            result = json.decode(response.body);
+          } else {
+            print("empty responce");
+          }
+          print("" + ".......getSupplier......" + result.toString());
+
+          bool success = result["status"];
+          if (success == true) {
+            loader.value = false;
+            country = CountryResponse.fromJson(json.decode(response.body));
+            countryList.addAll(country.data!);
+            print("length of list::" + countryList.length.toString());
+            return countryResponseFromJson(response.body);
+          } else {
+            loader.value = false;
+            String message = result["message"];
+            Get.snackbar("dfasdf", message);
+            return countryResponseFromJson(response.body);
+          }
+        });
+  }
+
+  getCountryVisaPriceApi(BuildContext context,String countryId,String visaTypeId,int index) {
+
+    Map<String, dynamic> map = Map<String, dynamic>();
+    map["country_check"] = countryId;
+    map["visatype_id"] =visaTypeId;
+
+    Webservice().loadPost(getCountryVisaPrice, map).then(
+          (model) => {
+        print("name is::" + model.message.toString()),
+        if (model.status == true) {
+         dynamicList[index].countryPrice=model.data.price.toString()+ " AED",
+          updateValue.value=true,
+        } else {}
+      },
+    );
+  }
+
+  Resource<GetCountryVisaPrice> get getCountryVisaPrice {
+    return Resource(
+        url: ApiEndpoint.getCountryVisaPrice,
+        parse: (response) {
+          var result;
+          //     Get.back();
+          //      final result = json.decode(response.body);
           if(response.body.isNotEmpty) {
             result= json.decode(response.body);
           }
@@ -421,18 +512,18 @@ class ApplyVisaController extends GetxController {
           print("" + ".......getSupplier......" + result.toString());
 
           bool success = result["status"];
+
           if (success==true) {
-            loader.value=false;
-            country=CountryResponse.fromJson(json.decode(response.body));
-            countryList.addAll(country.data!);
-            print("length of list::"+countryList.length.toString());
-            return countryResponseFromJson(response.body);
+
+
+            return getCountryVisaPriceFromJson(response.body);
           } else {
-            loader.value=false;
+
             String message = result["message"];
-            Get.snackbar("dfasdf", message);
-            return countryResponseFromJson(response.body);
+            Get.snackbar("oooopss", message);
+            return getCountryVisaPriceFromJson(response.body);
           }
         });
   }
+
 }

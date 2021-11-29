@@ -1,12 +1,13 @@
 import 'package:carousel_slider/carousel_options.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
-
-
+import 'package:flutter/scheduler.dart';
+import 'package:flutter_html/flutter_html.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:visa_app/constants/appColor.dart';
 import 'package:visa_app/constants/appImages.dart';
+import 'package:visa_app/constants/constants.dart';
 import 'package:visa_app/ui/typesOfVisaModule/controller/typesOfVisaController.dart';
 import 'package:visa_app/widget/commonAppBar.dart';
 import 'package:visa_app/widget/commonBottomNavigation.dart';
@@ -28,7 +29,17 @@ class _TypesOfVisaPageState extends State<TypesOfVisaPage> {
   @override
   void initState() {
     super.initState();
-    controller.typesOfVisaApi();
+    SchedulerBinding.instance!.addPostFrameCallback((timeStamp) async {
+      bool isOnline = await hasNetwork();
+      if(isOnline)  {
+        controller.typesOfVisaApi();
+      }
+      else{
+        Get.snackbar("oops..","Internet not avaliable");
+      }
+
+    });
+
   }
 
   @override
@@ -148,19 +159,37 @@ class _TypesOfVisaPageState extends State<TypesOfVisaPage> {
                                                 top: 10.h,
                                                ),
                                             child:
-                                            Text(
-                                              controller.visaTypeList[index]
+                                            Html(
+                                              data: controller
+                                                  .visaTypeList[index]
                                                   .visatypeDesc
                                                   .toString(),
-                                              maxLines:
-                                              controller.visaTypeList[index].descTextShowFlag ? 35 : 3,
-                                              textAlign: TextAlign.center,
-                                              style: TextStyle(
-                                                  color: colorBlack,
-                                                  fontSize: 16.sp,
-                                                  fontWeight:
-                                                      FontWeight.normal),
+                                              style: {
+                                                '#': Style(
+                                                  fontSize: FontSize(18),
+                                                  maxLines: controller
+                                                      .visaTypeList[index]
+                                                      .descTextShowFlag
+                                                      ? 35
+                                                      : 3,
+                                                  textOverflow:
+                                                  TextOverflow.ellipsis,
+                                                ),
+                                              },
                                             ),
+                                            // Text(
+                                            //   controller.visaTypeList[index]
+                                            //       .visatypeDesc
+                                            //       .toString(),
+                                            //   maxLines:
+                                            //   controller.visaTypeList[index].descTextShowFlag ? 35 : 3,
+                                            //   textAlign: TextAlign.center,
+                                            //   style: TextStyle(
+                                            //       color: colorBlack,
+                                            //       fontSize: 16.sp,
+                                            //       fontWeight:
+                                            //           FontWeight.normal),
+                                            // ),
                                           ),
 
 
@@ -241,8 +270,9 @@ class _TypesOfVisaPageState extends State<TypesOfVisaPage> {
                                     ),
                                   );
                                 })
-                            : Center(child: CircularProgressIndicator()),
-                      ))
+                            :controller.loader.value?Center(child: CircularProgressIndicator()):Container()),
+                      ),
+
                 ],
               ),
             ),

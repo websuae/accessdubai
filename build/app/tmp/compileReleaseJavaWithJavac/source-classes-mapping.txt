@@ -1,4 +1,0 @@
-io/flutter/plugins/GeneratedPluginRegistrant.java
- io.flutter.plugins.GeneratedPluginRegistrant
-com/visa/visa_app/BuildConfig.java
- com.visa.visa_app.BuildConfig
